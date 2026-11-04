@@ -14,6 +14,7 @@ library('dplyr')
 library('fs')
 library('ggplot2')
 library('here')
+library('skimr')
 
 # Run the original checks for either dataset, saving outputs separately.
 run_wp1_checks <- function(input_file, cohort) {
@@ -41,6 +42,12 @@ run_wp1_checks <- function(input_file, cohort) {
                    "age_group", "learndisability", "learndis", "housebound",
                    "died_during_study", "died_before_index", "bmi_missing", "bmi_cat"))
   vars <- intersect(vars, names(wp1_checks))
+
+  capture.output(
+    skimr::skim_without_charts(wp1_checks),
+    file = here::here("output", "wp1", "checks", cohort, "skim.txt"),
+    split = FALSE
+  )
   
   categorical_freq <- wp1_checks %>%
     mutate(across(all_of(vars), as.character)) %>%

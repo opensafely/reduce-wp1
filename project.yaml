@@ -100,8 +100,10 @@ actions:
       moderately_sensitive:
         csv: output/wp1/checks/main/check_*.csv
         figs: output/wp1/checks/main/check_*.png
+        txt: output/wp1/checks/main/skim.txt
         csv2: output/wp1/checks/ts/check_*.csv
         figs2: output/wp1/checks/ts/check_*.png
+        txt2: output/wp1/checks/ts/skim.txt
 
   wp1_timeseries:
     run: r:v2 analysis/wp1/2_wp1_timeseries.R 

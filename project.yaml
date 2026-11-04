@@ -1,8 +1,127 @@
 version: '5.0'
 
 actions:
-  generate_dataset:
-    run: ehrql:v1 generate-dataset analysis/dataset_definition.py --output output/dataset.csv.gz
+
+  # Extract population for consort diagram
+
+  # generate_dataset_consort:
+  #   run: ehrql:v1 generate-dataset analysis/dataset_definition/dataset_definition_consort.py --output output/dataset_consort.csv.gz
+  #   outputs:
+  #     highly_sensitive:
+  #       dataset: output/dataset_consort.csv.gz
+
+  # consort_diagram:
+  #   run: python:v2 python analysis/preprocessing/consort_diagram.py
+  #   needs: [generate_dataset_consort]
+  #   outputs:
+  #     moderately_sensitive:
+  #       dataset: output/consort_diagram_dta.csv
+  
+  generate_dataset_wp1_common:
+    run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_common.py --output output/tmp_dataset_wp1_common.csv.gz
     outputs:
       highly_sensitive:
-        dataset: output/dataset.csv.gz
+        dataset: output/tmp_dataset_wp1_common.csv.gz
+
+  diabetes_algo_wp1:
+    run: diabetes-algo:v0.0.9 --output output/tmp_dataset_wp1_common.csv.gz
+    config:
+      df_input: tmp_dataset_wp1_common.csv.gz
+      birth_date: dob
+      ethnicity_cat: ethnicity_cat
+      df_output: dataset_wp1_common.csv.gz
+    needs:
+      - generate_dataset_wp1_common
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset_wp1_common.csv.gz
+
+  generate_dataset_wp1_2019:
+    run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2019.csv.gz
+      -- --cohort_index_date "2019-02-01"
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset_wp1_2019.csv.gz
+
+  generate_dataset_wp1_2020:
+    run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2020.csv.gz
+      -- --cohort_index_date "2020-02-01"
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset_wp1_2020.csv.gz
+
+  generate_dataset_wp1_2021:
+    run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2021.csv.gz
+      -- --cohort_index_date "2021-02-01"
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset_wp1_2021.csv.gz
+
+  generate_dataset_wp1_2022:
+    run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2022.csv.gz
+      -- --cohort_index_date "2022-02-01"
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset_wp1_2022.csv.gz
+
+  generate_dataset_wp1_2023:
+    run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2023.csv.gz
+      -- --cohort_index_date "2023-02-01"
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset_wp1_2023.csv.gz
+        
+  generate_dataset_wp1_2024:
+    run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2024.csv.gz
+      -- --cohort_index_date "2024-02-01"
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset_wp1_2024.csv.gz
+        
+  generate_dataset_wp1_2025:
+    run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2025.csv.gz
+      -- --cohort_index_date "2025-02-01"
+    outputs:
+      highly_sensitive:
+        dataset: output/dataset_wp1_2025.csv.gz
+
+  wp1_processing:
+    run: r:v2 analysis/wp1/0_wp1_processing.R
+    needs: [diabetes_algo_wp1, generate_dataset_wp1_2019, generate_dataset_wp1_2020, generate_dataset_wp1_2021, generate_dataset_wp1_2022, generate_dataset_wp1_2023, generate_dataset_wp1_2024, generate_dataset_wp1_2025]
+    outputs:
+      highly_sensitive:
+        data: output/wp1/wp1_ts_all.csv
+        data2: output/wp1/wp1_main.csv
+ 
+  wp1_checks:
+    run: r:v2 analysis/wp1/1_wp1_checks.R 
+    needs: [wp1_processing]
+    outputs:
+      moderately_sensitive:
+        csv: output/wp1/checks/main/check_*.csv
+        figs: output/wp1/checks/main/check_*.png
+        txt: output/wp1/checks/main/skim.txt
+        csv2: output/wp1/checks/ts/check_*.csv
+        figs2: output/wp1/checks/ts/check_*.png
+        txt2: output/wp1/checks/ts/skim.txt
+
+  wp1_timeseries:
+    run: r:v2 analysis/wp1/2_wp1_timeseries.R 
+    needs: [wp1_processing]
+    outputs:
+      moderately_sensitive:
+        csv: output/wp1/wp1_timeseries.csv
+
+  wp1_tables:
+    run: r:v2 analysis/wp1/3_wp1_tables.R 
+    needs: [wp1_processing]
+    outputs:
+      moderately_sensitive:
+        csv: output/wp1/tables/wp1_*.csv
+
+  wp1_combos:
+    run: r:v2 analysis/wp1/4_wp1_combinations.R 
+    needs: [wp1_processing]
+    outputs:
+      moderately_sensitive:
+        csv: output/wp1/wp1_combinations.csv

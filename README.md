@@ -1,6 +1,8 @@
-# reduce-wp1
+# POS-2026-3018 : REDUCE-HF, an electronic health records study of inequalities in heart failure diagnosis in England
 
-[View on OpenSAFELY](https://jobs.opensafely.org/repo/https%253A%252F%252Fgithub.com%252Fopensafely%252Freduce-wp1)
+[View project description](https://www.opensafely.org/project/pos-2026-3018/)
+
+[View workspace on OpenSAFELY](https://jobs.opensafely.org/repo/https%253A%252F%252Fgithub.com%252Fopensafely%252Freduce-wp1)
 
 Details of the purpose and any published outputs from this project can be found at the link above.
 

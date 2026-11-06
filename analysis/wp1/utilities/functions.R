@@ -27,28 +27,33 @@ clean.fn <- function(df, start_date, num_years){
            ) %>%
   #  subset(patient_index_date <= start_date & patient_end_date >= start_date) %>%
     mutate(
-           copd = first_copd_date < start_date,
-           hypertension = (
+           copd = coalesce(first_copd_date < start_date, FALSE),
+           hypertension = coalesce(
              (hypertension_date_primary < start_date) |
                (hypertension_date_sus < start_date) |
                ((hypertension_date_med < start_date) & 
-                  (hypertension_date_med >= start_date - years(1)))
-               ),
-           af = (
+                  (hypertension_date_med >= start_date - years(1))), 
+               FALSE
+              ),
+           af = coalesce(
              (af_date_primary < start_date) |
-               (af_date_sus < start_date)
+               (af_date_sus < start_date),
+               FALSE
            ),
-           ihd = (
+           ihd = coalesce(
              (ihd_date_primary < start_date) |
-               (ihd_date_sus < start_date)
+               (ihd_date_sus < start_date),
+                FALSE
            ),
-           ckd = (
+           ckd = coalesce(
              (ckd_date_primary < start_date) |
-               (ckd_date_sus < start_date)
+               (ckd_date_sus < start_date),
+               FALSE
            ),
-           t2dm = (
+           t2dm = coalesce(
              (t2dm_date < start_date) &
-               (cat_diabetes == "T2DM")
+               (cat_diabetes == "T2DM"),
+               FALSE
            ),
            age =  as.period(interval(birth_date, start_date))$year,
            age_group = case_when(
@@ -58,12 +63,14 @@ clean.fn <- function(df, start_date, num_years){
              75<=age & age<85 ~ "75-84 years",
              85<=age ~ ">=85 years"
            ),
-           learndisability = (
-             (learndis < start_date)
+           learndisability = coalesce(
+             (learndis < start_date),
+             FALSE
            ),
-           died_during_study = (
+           died_during_study = coalesce(
              (death_date > start_date) &
-               (death_date <= start_date + years(num_years))
+               (death_date <= start_date + years(num_years)),
+               FALSE
            ),
            bmi = as.numeric(
              ifelse((bmi_date < start_date) &
@@ -79,26 +86,43 @@ clean.fn <- function(df, start_date, num_years){
                !is.na(bmi) & bmi >= 10 & bmi < 20 ~ "Underweight",
                .default = "Missing"
              ),
-           rural = (rural_urban >=5 & !is.na(rural_urban)),
-           hf_diagnosis_primary = (hf_diagnosis_primary_date >= start_date) & 
+           rural = coalesce(rural_urban >=5 & !is.na(rural_urban), FALSE),
+           hf_diagnosis_primary = coalesce(
+             (hf_diagnosis_primary_date >= start_date) & 
              (hf_diagnosis_primary_date < start_date + years(num_years)),
-           hf_diagnosis_apc = (hf_diagnosis_apc_date >= start_date) & 
+             FALSE
+           ),
+           hf_diagnosis_apc = coalesce(
+            (hf_diagnosis_apc_date >= start_date) & 
              (hf_diagnosis_apc_date < start_date + years(num_years)),
-           hf_diagnosis_ec = (hf_diagnosis_ec_date >= start_date) & 
+             FALSE
+           ),
+           hf_diagnosis_ec = coalesce(
+             (hf_diagnosis_ec_date >= start_date) & 
              (hf_diagnosis_ec_date < start_date + years(num_years)),
-           hf_death = (hf_death_date >= start_date) & 
+             FALSE
+           ),
+           hf_death = coalesce(
+            (hf_death_date >= start_date) & 
              (hf_death_date < start_date + years(num_years)),
-           hf_diagnosis_emerg = (hf_diagnosis_emerg_date >= start_date) & 
+             FALSE
+           ),
+           hf_diagnosis_emerg = coalesce(
+            (hf_diagnosis_emerg_date >= start_date) & 
              (hf_diagnosis_emerg_date < start_date + years(num_years)),
-           hf_diagnosis_any = (hf_diagnosis_emerg | hf_diagnosis_primary),
-           
+             FALSE
+           ),
+           hf_diagnosis_any = coalesce(
+            (hf_diagnosis_emerg | hf_diagnosis_primary),
+            FALSE
+           ),
            hf_diagnosis_type = case_when(
              hf_diagnosis_emerg == TRUE ~ "Emergency diagnosis",
              hf_diagnosis_primary == TRUE ~ "Primary care diagnosis",
              .default = "No diagnosis"),
            
-           hf_diagnosis_any_date = pmin(hf_diagnosis_primary_date, hf_diagnosis_emerg_date)
-           ) %>%
+           hf_diagnosis_any_date = pmin(hf_diagnosis_primary_date, hf_diagnosis_emerg_date, na.rm = TRUE)
+    ) %>%
     select(!c(hf_exclude_date, first_copd_date, hypertension_date_primary,
               hypertension_date_med, hypertension_date_sus, af_date_primary,
               af_date_sus, ihd_date_primary, ihd_date_sus, ckd_date_primary,

@@ -27,7 +27,6 @@ run_wp1_checks <- function(input_file, cohort) {
     mutate(time_index_to_death = (death_date - patient_index_date),
            died_before_index = ifelse((death_date <= patient_index_date) %in% TRUE, "Yes", "No")) 
 
-  # Preserve the factor conversion from wp1_checks.R, but only for columns present.
   factor_vars <- c("region", "imd_quintile", "rural", "smoking", "died_during_study",
                    "migrant", "non_english_speaking", "smi", "substance_abuse", "homeless",
                    "learndisability", "housebound", "sex", "hf_diagnosis_primary",
@@ -36,7 +35,8 @@ run_wp1_checks <- function(input_file, cohort) {
                    "bmi_missing")
 
   # Frequency distribution for categorical variables
-  vars <- unique(c("sex", "region", "imd_quintile", "rural", "rural_urban", "smoking",
+  vars <- unique(c("hf_diagnosis_emerg","hf_diagnosis_any","sex", "region", "imd_quintile", 
+                    "rural", "rural_urban", "smoking",
                    "migrant", "non_english_speaking", "smi", "substance_abuse", "homeless",
                    "ethnicity_cat", "copd", "hypertension", "af", "ihd", "ckd", "t2dm", "t1dm",
                    "age_group", "learndisability", "learndis", "housebound",

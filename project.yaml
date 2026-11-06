@@ -99,10 +99,10 @@ actions:
     outputs:
       moderately_sensitive:
         csv: output/wp1/checks/main/check_*.csv
-        figs: output/wp1/checks/main/check_*.png
+        figs: output/wp1/checks/main/figures/*.png
         txt: output/wp1/checks/main/skim.txt
         csv2: output/wp1/checks/ts/check_*.csv
-        figs2: output/wp1/checks/ts/check_*.png
+        figs2: output/wp1/checks/ts/figures/*.png
         txt2: output/wp1/checks/ts/skim.txt
 
   wp1_timeseries:

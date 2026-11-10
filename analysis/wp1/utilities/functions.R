@@ -74,7 +74,7 @@ clean.fn <- function(df, start_date, num_years){
            ),
            age =  as.period(interval(dob, start_date))$year,
            age_group = case_when(
-             40<=age & age<55 ~ "40-54 years",
+             45<=age & age<55 ~ "45-54 years",
              55<=age & age<65 ~ "55-64 years",
              65<=age & age<75 ~ "65-74 years",
              75<=age & age<85 ~ "75-84 years",
@@ -142,16 +142,16 @@ clean.fn <- function(df, start_date, num_years){
            ),
            hf_diagnosis_type = case_when(
             is.na(hf_diagnosis_any_date) ~ "No diagnosis",
-            hf_diagnosis_emerg_date == hf_diagnosis_any_date ~
-              "Emergency diagnosis",
-            hf_diagnosis_primary_date == hf_diagnosis_any_date ~
-              "Primary care diagnosis"
+            hf_diagnosis_emerg_date == hf_diagnosis_any_date ~ "Emergency diagnosis",
+            hf_diagnosis_primary_date == hf_diagnosis_any_date ~ "Primary care diagnosis"
            ),
           patient_end_date = pmin(death_date, 
                                    practice_deregistration_date, 
                                    hf_diagnosis_primary_date,
                                    hf_diagnosis_emerg_date,
-                                   as.Date("2026-01-01"), na.rm= TRUE)
+                                   start_date + years(num_years),
+                                   as.Date("2025-31-01"), 
+                                   na.rm= TRUE)
     ) %>%
     select(!c(hf_exclude_date, first_copd_date, hypertension_date_primary,
               hypertension_date_med, hypertension_date_sus, af_date_primary,

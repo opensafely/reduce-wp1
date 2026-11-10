@@ -22,7 +22,7 @@ wp1_common <- read_csv(here::here("output", "dataset_wp1_common.csv.gz"))
 ####
 
 
-# Main data file - i.e. index date is 1 Jan 2023
+# Main data file - i.e. index date is 1 Feb 2023
 wp1_main <- merge.fn(2023) %>%
   clean.fn(as.Date("2023-02-01"), 3) %>%
   mutate(person_days = as.numeric(as.Date(patient_end_date) - as.Date(patient_index_date)),

@@ -72,7 +72,6 @@ def fn(dataset, start_date, end_date='2025-02-01'):
         first_practice.start_date + years(1),
         dataset.dob + years(45))
 
-
     # add practice deregistration / end of follow-up in tpp
     last_practice = (
         practice_registrations.where(

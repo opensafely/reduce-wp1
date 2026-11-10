@@ -54,7 +54,8 @@ def fn(dataset, start_date, end_date='2025-02-01'):
     #earliest practice registration
     first_practice = (
         practice_registrations.where(
-            practice_registrations.end_date.is_after(start_date))
+            (practice_registrations.end_date.is_after(start_date)) | practice_registrations.end_date.is_null()
+            )
         .sort_by(
             practice_registrations.start_date,
             practice_registrations.end_date,
@@ -75,7 +76,8 @@ def fn(dataset, start_date, end_date='2025-02-01'):
     # add practice deregistration / end of follow-up in tpp
     last_practice = (
         practice_registrations.where(
-            practice_registrations.end_date.is_after(start_date))
+            practice_registrations.end_date.is_after(start_date) | practice_registrations.end_date.is_null()
+            )
         .sort_by(
             practice_registrations.start_date,
             practice_registrations.end_date,

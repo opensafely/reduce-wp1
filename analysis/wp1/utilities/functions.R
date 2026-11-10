@@ -40,7 +40,7 @@ clean.fn <- function(df, start_date, num_years){
   df %>%
     mutate(followup_end_date = pmin(death_date, 
                                     practice_deregistration_date, 
-                                    as.Date("2026-01-01"), na.rm= TRUE)
+                                    as.Date("2025-12-31"), na.rm= TRUE)
            ) %>%
     subset(patient_index_date <= start_date & followup_end_date >= start_date) %>%
     mutate(

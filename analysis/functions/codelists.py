@@ -164,7 +164,7 @@ ihd_icd10 = codelist_from_csv(
 
 #Atrial fibrillation (af)
 af_snomed = codelist_from_csv(
-    "codelists/bristol-atrial-fibrillation-snomed.csv",
+    "codelists/nhsd-primary-care-domain-refsets-afib_cod.csv",
     column="code"
 )
 

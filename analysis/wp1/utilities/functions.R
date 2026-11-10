@@ -72,7 +72,7 @@ clean.fn <- function(df, start_date, num_years){
                (cat_diabetes == "T2DM"),
                FALSE
            ),
-           age =  as.period(interval(date_of_birth, start_date))$year,
+           age =  as.period(interval(dob, start_date))$year,
            age_group = case_when(
              40<=age & age<55 ~ "40-54 years",
              55<=age & age<65 ~ "55-64 years",

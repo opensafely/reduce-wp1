@@ -24,7 +24,7 @@ bristol/copd-exacerbations/2896912f/
 opensafely/copd-exacerbation/6858db5b/
 bristol/ischaemic-heart-disease-icd10/37151caf
 bristol/ischaemic-heart-disease-snomed/50248fe4
-bristol/atrial-fibrillation-snomed/6be6c30f
+nhsd-primary-care-domain-refsets/afib_cod/20260630/
 reducehf/atrial-fibrillation-and-flutter-icd10/0cfc2f94/
 nhsd-primary-care-domain-refsets/dmtype1_cod/20250912/
 reducehf/type-1-diabetes-icd10/6cd3a5f9/

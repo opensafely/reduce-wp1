@@ -156,11 +156,11 @@
       "downloaded_at": "2026-03-10 15:26:13.546089Z",
       "sha": "7422177fe7f7da97e83c887d11bc607e10b5062c"
     },
-    "bristol-atrial-fibrillation-snomed.csv": {
-      "id": "bristol/atrial-fibrillation-snomed/6be6c30f",
-      "url": "https://www.opencodelists.org/codelist/bristol/atrial-fibrillation-snomed/6be6c30f/",
-      "downloaded_at": "2026-03-10 15:26:13.653782Z",
-      "sha": "599ece2ce3f97cb504d4e023151a1ba0edbd3140"
+    "nhsd-primary-care-domain-refsets-afib_cod.csv": {
+      "id": "nhsd-primary-care-domain-refsets/afib_cod/20260630",
+      "url": "https://www.opencodelists.org/codelist/nhsd-primary-care-domain-refsets/afib_cod/20260630/",
+      "downloaded_at": "2026-11-10 09:17:54.277821+00:00Z",
+      "sha": "f725c17fabdbc9afda40bca63fa773b6bd984f01"
     },
     "reducehf-atrial-fibrillation-and-flutter-icd10.csv": {
       "id": "reducehf/atrial-fibrillation-and-flutter-icd10/0cfc2f94",

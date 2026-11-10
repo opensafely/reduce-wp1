@@ -8,25 +8,24 @@ library('reshape2')
 library('dplyr')
 library('fs')
 
-# For running locally only #
-#setwd("C:/Users/aschaffer/OneDrive - Nexus365/Documents/GitHub/reducehf")
-#getwd()
 
 dir_create(here::here("output", "wp1"), recurse = TRUE)
-source(here::here("analysis", "wp1", "utilities", "functions.R"))
+source(here::here("analysis", "wp1", "utilities", "other_functions.R"))
+source(here::here("analysis", "wp1", "utilities", "cleaning.R"))
+
 
 # read in data with common variables
 wp1_common <- read_csv(here::here("output", "dataset_wp1_common.csv.gz"))
 
-
-####
-
+###
 
 # Main data file - i.e. index date is 1 Feb 2023
 wp1_main <- merge.fn(2023) %>%
   clean.fn(as.Date("2023-02-01"), 3) %>%
-  mutate(person_days = as.numeric(as.Date(patient_end_date) - as.Date(patient_index_date)),
-    year = 2023)
+  mutate(
+    person_days = as.numeric(as.Date(patient_end_date) - as.Date(patient_index_date)),
+    year = 2023
+    )
 
 write.csv(wp1_main, here::here("output", "wp1", "wp1_main.csv"), row.names = FALSE)
 

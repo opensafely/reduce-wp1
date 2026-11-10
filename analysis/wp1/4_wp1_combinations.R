@@ -1,5 +1,3 @@
-
-
 # Import libraries #
 library('tidyverse')
 library('lubridate')
@@ -12,12 +10,8 @@ library('gtsummary')
 library('gt')
 
 
-# For running locally only #
-#setwd("C:/Users/aschaffer/OneDrive - Nexus365/Documents/GitHub/reducehf")
-#getwd()
-
 ## Custom functions
-source(here::here("analysis", "wp1", "utilities", "functions.R"))
+source(here::here("analysis", "wp1", "utilities", "other_functions.R"))
 
 wp1_main <- read_csv(here::here("output","wp1","wp1_main.csv"))
 

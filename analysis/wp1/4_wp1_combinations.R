@@ -16,7 +16,7 @@ source(here::here("analysis", "wp1", "utilities", "other_functions.R"))
 wp1_main <- read_csv(here::here("output","wp1","wp1_main.csv"))
 
 for_combos <- wp1_main %>%
-  mutate(age_1 = (age_group == "40-54 years"),
+  mutate(age_1 = (age_group == "45-54 years"),
          age_2 = (age_group == "55-64 years"),
          age_3 = (age_group == "65-74 years"),
          age_4 = (age_group == "75-84 years"),
@@ -46,11 +46,11 @@ for_combos <- wp1_main %>%
          region_east = (region == "East"),
          region_emidlands = (region == "East Midlands"),
          
-         male = (sex == "Male"), 
+         male = (sex == "male"), 
          
-         smok_never = (smoking = "N"),
-         smok_ever = (smoking = "E"),
-         smok_curr = (smoking = "C"))
+         smok_never = (smoking == "N"),
+         smok_ever = (smoking == "E"),
+         smok_curr = (smoking == "C"))
          
   
 
@@ -66,7 +66,7 @@ combos <- for_combos %>%
                     eth_white, eth_nonwhite, 
                     bmi_obese, bmi_overweight, bmi_underweight))) %>%
   summarise(pop = rounding(n()),
-            pdays =  sum(person_days), 
+            pdays =  sum(person_days , na.rm = TRUE), 
             hf_emerg = rounding(sum(hf_diagnosis_type == "Emergency diagnosis", na.rm = TRUE)),
             .groups = "drop") %>%
   distinct() %>%

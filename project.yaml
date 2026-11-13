@@ -119,9 +119,9 @@ actions:
       moderately_sensitive:
         csv: output/wp1/tables/wp1_*.csv
 
-  wp1_combos:
-    run: r:v2 analysis/wp1/4_wp1_combinations.R 
-    needs: [wp1_processing]
-    outputs:
-      moderately_sensitive:
-        csv: output/wp1/wp1_combinations.csv
+  # wp1_combos:
+  #   run: r:v2 analysis/wp1/4_wp1_combinations.R 
+  #   needs: [wp1_processing]
+  #   outputs:
+  #     moderately_sensitive:
+  #       csv: output/wp1/wp1_combinations.csv

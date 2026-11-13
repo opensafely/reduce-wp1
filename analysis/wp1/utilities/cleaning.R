@@ -118,11 +118,15 @@ clean.fn <- function(df, start_date, num_years){
             FALSE
            ),
 
-           hf_diagnosis_any_date = ifelse(
-            is.na(hf_diagnosis_any), 
-            as.Date(NA), 
-            pmin(hf_diagnosis_primary_date, hf_diagnosis_emerg_date, na.rm = TRUE)
-           ),
+           hf_diagnosis_any_date = if_else(
+              hf_diagnosis_any == FALSE,
+              as.Date(NA),
+              pmin(
+                hf_diagnosis_primary_date,
+                hf_diagnosis_emerg_date,
+                na.rm = TRUE
+              )
+            ),
 
            hf_diagnosis_type = case_when(
             is.na(hf_diagnosis_any_date) ~ "No diagnosis",

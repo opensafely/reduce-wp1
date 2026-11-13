@@ -39,5 +39,5 @@ wp1_ts <- bind_rows(wp1_ts_all, wp1_ts_age, wp1_ts_sex, wp1_ts_eth, wp1_ts_age_s
                 wp1_ts_eth_age)
 
 
-write.csv(wp1_ts, here::here("output","wp1","wp1_timeseries.csv"))
+write.csv(wp1_ts, here::here("output","wp1","wp1_timeseries.csv"), row.names = FALSE)
 

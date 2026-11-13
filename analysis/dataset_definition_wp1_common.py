@@ -67,10 +67,10 @@ dataset.define_population(
     & (patients.date_of_birth.is_not_null()) #known dob proxy for data quality
     & ~(patients.age_on(end_date) < 45) #remove pts < 45 at latest possible date
     & ~(patients.age_on(start_date) >= 110) #remove pts age 110+ at earliest possible start date
-    & ((start_date < dataset.death_date)|(dataset.death_date.is_null())) #remove pts who died before start
-    & ~((dataset.sex == 'male') & (dataset.hrtcocp.is_not_null())) #remove males with hrt / cocp codes
-    & ~((dataset.sex == 'male') & (dataset.pregnancy.is_not_null())) #remove males with pregnancy codes
-    & ~((dataset.sex == 'female') & (dataset.prostate_cancer.is_not_null())) #remove females with prostate cancer codes
+    & ((start_date < dataset.death_date) | (dataset.death_date.is_null())) #remove pts who died before start
+   # & ~((patients.sex == 'male') & (dataset.hrtcocp.is_not_null())) #remove males with hrt / cocp codes
+   # & ~((patients.sex == 'male') & (dataset.pregnancy.is_not_null())) #remove males with pregnancy codes
+   # & ~((patients.sex == 'female') & (dataset.prostate_cancer.is_not_null())) #remove females with prostate cancer codes
     & ~(dataset.hf_exclude_date < start_date)
 )
 

@@ -91,6 +91,10 @@ actions:
     outputs:
       highly_sensitive:
         data: output/wp1/wp1_main.csv
+      moderately_sensitive:
+        csv: output/wp1/checks/main/check_*.csv
+        figs: output/wp1/checks/main/figures/*.png
+        txt: output/wp1/checks/main/skim.txt
    
   wp1_processing_ts:
     run: r:v2 analysis/wp1/0_wp1_processing_ts.R
@@ -98,15 +102,7 @@ actions:
     outputs:
       highly_sensitive:
         data: output/wp1/wp1_ts_all.csv
-
-  wp1_checks:
-    run: r:v2 analysis/wp1/1_wp1_checks.R 
-    needs: [wp1_processing_main, wp1_processing_ts]
-    outputs:
       moderately_sensitive:
-        csv: output/wp1/checks/main/check_*.csv
-        figs: output/wp1/checks/main/figures/*.png
-        txt: output/wp1/checks/main/skim.txt
         csv2: output/wp1/checks/ts/check_*.csv
         figs2: output/wp1/checks/ts/figures/*.png
         txt2: output/wp1/checks/ts/skim.txt

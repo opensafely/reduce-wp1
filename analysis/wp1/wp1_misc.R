@@ -147,29 +147,4 @@ ggplot(subset(both, sex == "Female")) +
 #######
 
 
-clean2.fn <- function(df){
-  df %>%
-    mutate(hf_diagnosis_primary_3yrs = (hf_diagnosis_primary_date >= patient_index_date) & 
-             (hf_diagnosis_primary_date < patient_index_date + years(3)),
-           hf_diagnosis_apc_3yrs = (hf_diagnosis_apc_date >= patient_index_date) & 
-             (hf_diagnosis_apc_date < patient_index_date + years(3)),
-           hf_diagnosis_ec_3yrs = (hf_diagnosis_ec_date >= patient_index_date) & 
-             (hf_diagnosis_ec_date < patient_index_date + years(3)),
-           hf_death_3yrs = (hf_death_date >= patient_index_date) & 
-             (hf_death_date < patient_index_date + years(3)),
-           hf_diagnosis_emerg = (hf_diagnosis_emerg_date >= patient_index_date) & 
-             (hf_diagnosis_emerg_date < patient_index_date + years(3)),
-           hf_diagnosis_any = (hf_diagnosis_emerg | hf_diagnosis_primary ))
-}
 
-
-wp1_covid <- wp1_2020 %>%
-  clean2.fn()
-
-mutate()
-
-
-
-
-
-#write.csv(wp1_common, "C:/Users/aschaffer/OneDrive - Nexus365/Documents/GitHub/reducehf/output/dataset_wp1_common.csv")

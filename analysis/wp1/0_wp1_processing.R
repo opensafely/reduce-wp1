@@ -19,7 +19,7 @@ wp1_common <- read_csv(here::here("output", "dataset_wp1_common.csv.gz")) %>%
   filter(
     !coalesce(sex == "male" & hrtcocp == TRUE, FALSE) &
     !coalesce(sex == "male" & pregnancy == TRUE, FALSE) &
-    !coalesce(sex == "female" & prostate_cancer == TRUE, FALSE)
+    !coalesce(sex == "female" & prostate_cancer == TRUE, FALSE) 
   )
 
 ###
@@ -27,6 +27,11 @@ wp1_common <- read_csv(here::here("output", "dataset_wp1_common.csv.gz")) %>%
 # Main data file - i.e. index date is 1 Feb 2023
 wp1_main <- merge.fn(2023) %>%
   clean.fn(as.Date("2023-02-01"), 3) %>%
+  filter(
+    (is.na(hf_exclude_date) | hf_exclude_date >= as.Date("2023-02-01")) &
+    (is.na(death_date) | death_date >= as.Date("2023-02-01")) &
+    (age >= 45)
+    ) %>%
   mutate(
     person_days = as.numeric(as.Date(patient_end_date) - as.Date(patient_index_date)),
     year = 2023

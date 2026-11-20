@@ -71,7 +71,6 @@ dataset.define_population(
    # & ~((patients.sex == 'male') & (dataset.hrtcocp.is_not_null())) #remove males with hrt / cocp codes
    # & ~((patients.sex == 'male') & (dataset.pregnancy.is_not_null())) #remove males with pregnancy codes
    # & ~((patients.sex == 'female') & (dataset.prostate_cancer.is_not_null())) #remove females with prostate cancer codes
-    & ~(dataset.hf_exclude_date < start_date)
 )
 
 

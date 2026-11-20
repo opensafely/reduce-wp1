@@ -10,7 +10,7 @@ clean.fn <- function(df, start_date, num_years){
            ) %>%
     subset(patient_index_date <= start_date & followup_end_date >= start_date) %>%
     mutate( 
-           age =  as.period(interval(birth_date, start_date))$year,
+           age = floor(time_length(interval(birth_date, start_date), "years")),
 
            age_group = case_when(
              45<=age & age<55 ~ "45-54 years",
@@ -142,7 +142,7 @@ clean.fn <- function(df, start_date, num_years){
                                    as.Date("2025-12-31"), 
                                    na.rm= TRUE)
     ) %>%
-    select(!c(hf_exclude_date, first_copd_date, hypertension_date_primary,
+    select(!c(first_copd_date, hypertension_date_primary,
               hypertension_date_med, hypertension_date_sus, af_date_primary,
               af_date_sus, ihd_date_primary, ihd_date_sus, ckd_date_primary,
               ckd_date_sus, t2dm_date, cat_diabetes, bmi_date, obesity_primary_date,

@@ -16,9 +16,11 @@ source(here::here("analysis", "wp1", "utilities", "cleaning.R"))
 
 # read in data with common variables
 wp1_common <- read_csv(here::here("output", "dataset_wp1_common.csv.gz")) %>%
-  filter(!(sex == "male" & hrtcocp == TRUE) &
-          !(sex == "male" & pregnancy == TRUE) &
-          !(sex == "female" & prostate_cancer == TRUE))
+  filter(
+    !coalesce(sex == "male" & hrtcocp == TRUE, FALSE) &
+    !coalesce(sex == "male" & pregnancy == TRUE, FALSE) &
+    !coalesce(sex == "female" & prostate_cancer == TRUE, FALSE)
+  )
 
 ###
 

@@ -32,7 +32,7 @@ merge.fn <- function(year) {
         "last_cholesterol_date",
         "last_cholesterol_value",
         "weight", "weight_date", "height",
-        "carehome_at_index", "death_date_common",
+        "carehome_at_index", 
         "household_size"
       ))
       )

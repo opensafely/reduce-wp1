@@ -6,12 +6,16 @@ clean.fn <- function(df, start_date, num_years){
       followup_end_date = 
         pmin(death_date, 
             practice_deregistration_date, 
-            as.Date("2025-12-31"), na.rm= TRUE)
+            start_date + years(num_years),
+            as.Date("2025-12-31"), 
+            na.rm= TRUE)
            ) %>%
-    subset(patient_index_date <= start_date & followup_end_date >= start_date) %>%
+    filter( 
+      !coalesce(sex == "male" & hrtcocp == TRUE, FALSE) &
+      !coalesce(sex == "male" & pregnancy == TRUE, FALSE) &
+      !coalesce(sex == "female" & prostate_cancer == TRUE, FALSE) &
+      followup_end_date >= start_date) %>%
     mutate( 
-           age = floor(time_length(interval(birth_date, start_date), "years")),
-
            age_group = case_when(
              45<=age & age<55 ~ "45-54 years",
              55<=age & age<65 ~ "55-64 years",
@@ -19,6 +23,8 @@ clean.fn <- function(df, start_date, num_years){
              75<=age & age<85 ~ "75-84 years",
              85<=age ~ ">=85 years"
            ),
+
+           person_days = as.numeric(as.Date(followup_end_date) - as.Date(start_date)),
 
       # create flags for whether people had condition on analysis start date
            copd = coalesce(first_copd_date < start_date, FALSE),
@@ -50,8 +56,7 @@ clean.fn <- function(df, start_date, num_years){
            ),
 
            t2dm = coalesce(
-             (t2dm_date < start_date) &
-               (cat_diabetes == "T2DM"),
+             (t2dm_date < start_date),
                FALSE
            ),
 
@@ -62,7 +67,8 @@ clean.fn <- function(df, start_date, num_years){
 
            bmi = as.numeric(
              ifelse((bmi_date < start_date) &
-                    (bmi_date >= (start_date - years(2))), 
+                    (bmi_date >= (start_date - years(2))) &
+                    (bmi_value < 60), 
                     bmi_value, NA) 
            ),
            bmi_missing = ifelse(is.na(bmi), "Yes", "No"),
@@ -118,20 +124,20 @@ clean.fn <- function(df, start_date, num_years){
             FALSE
            ),
 
-           hf_diagnosis_any_date = if_else(
-              hf_diagnosis_any == FALSE,
-              as.Date(NA),
-              pmin(
-                hf_diagnosis_primary_date,
-                hf_diagnosis_emerg_date,
-                na.rm = TRUE
-              )
+           hf_diagnosis_any_date = 
+              case_when(
+                hf_diagnosis_any == FALSE ~ as.Date(NA),
+                hf_diagnosis_any == TRUE & hf_diagnosis_emerg == TRUE 
+                  & hf_diagnosis_ec < hf_diagnosis_primary ~ hf_diagnosis_emerg_date,
+                hf_diagnosis_any == TRUE & hf_diagnosis_primary == TRUE 
+                  & hf_diagnosis_ec > hf_diagnosis_primary ~ hf_diagnosis_primary_date,
+                .default = as.Date(NA)
             ),
 
            hf_diagnosis_type = case_when(
-            is.na(hf_diagnosis_any_date) ~ "No diagnosis",
-            hf_diagnosis_emerg_date == hf_diagnosis_any_date ~ "Emergency diagnosis",
-            hf_diagnosis_primary_date == hf_diagnosis_any_date ~ "Primary care diagnosis"
+                is.na(hf_diagnosis_any_date) ~ "No diagnosis",
+                hf_diagnosis_emerg_date == hf_diagnosis_any_date ~ "Emergency diagnosis",
+                hf_diagnosis_primary_date == hf_diagnosis_any_date ~ "Primary care diagnosis"
            ),
 
           patient_end_date = pmin(death_date, 
@@ -145,7 +151,12 @@ clean.fn <- function(df, start_date, num_years){
     select(!c(first_copd_date, hypertension_date_primary,
               hypertension_date_med, hypertension_date_sus, af_date_primary,
               af_date_sus, ihd_date_primary, ihd_date_sus, ckd_date_primary,
-              ckd_date_sus, t2dm_date, cat_diabetes, bmi_date, obesity_primary_date,
-              obesity_sus_date, learndis, bmi_value)) 
-  
+              ckd_date_sus, t2dm_date, bmi_date, obesity_primary_date,
+              obesity_sus_date, learndis, bmi_value, prostate_cancer, pregnancy, 
+              hrtcocp, tmp_copd_date_primary, tmp_copd_date_sus,
+              otherdm_date, gestationaldm_date, t1dm_date, practice_id, practice_stp,
+              msoa, sysbp_date, sysbp_value, diasbp_date, diasbp_value,
+              last_hdl_cholesterol_date, last_hdl_cholesterol_value,
+              last_cholesterol_date, last_cholesterol_value, weight, 
+              weight_date, height, carehome_at_index, household_size)) 
 }

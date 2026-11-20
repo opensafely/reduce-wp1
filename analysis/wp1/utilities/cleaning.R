@@ -8,7 +8,8 @@ clean.fn <- function(df, start_date, num_years){
             practice_deregistration_date, 
             start_date + years(num_years),
             as.Date("2025-12-31"), 
-            na.rm= TRUE)
+            na.rm= TRUE),
+      start_date = as.Date(start_date)
            ) %>%
     filter( 
       !coalesce(sex == "male" & hrtcocp == TRUE, FALSE) &
@@ -158,5 +159,11 @@ clean.fn <- function(df, start_date, num_years){
               msoa, sysbp_date, sysbp_value, diasbp_date, diasbp_value,
               last_hdl_cholesterol_date, last_hdl_cholesterol_value,
               last_cholesterol_date, last_cholesterol_value, weight, 
-              weight_date, height, carehome_at_index, household_size)) 
+              weight_date, height, carehome_at_index, household_size,
+              tmp_antidiabetic_drugs_dmd_date, tmp_diabetes_medication_date,
+              tmp_first_diabetes_diag_date, tmp_insulin_dmd_date,
+              tmp_nonmetform_drugs_dmd_date, tmp_poccdm_date,
+              practice_registration_date, hf_exclude_date,
+              hf_diagnosis_ec_date, tmp_t2dm_count_num, tmp_poccdm_ctv3_count_num,
+              )) 
 }

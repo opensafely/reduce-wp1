@@ -10,14 +10,14 @@ run_wp1_checks <- function(input_file, cohort) {
   # read in cleaned data
   wp1_checks <- read_csv(input_file) %>%
     mutate(death_date = as.Date(death_date),
-      patient_index_date = as.Date(patient_index_date),
+      start_date = as.Date(start_date),
       time_index_to_death = as.numeric(
-       death_date - patient_index_date,
+       death_date - start_date,
        units = "days"
       ),
       died_before_index = if_else(
         !is.na(death_date) &
-        death_date <= patient_index_date,
+        death_date <= start_date,
         "Yes","No"
       )
     ) 

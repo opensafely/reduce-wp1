@@ -4,7 +4,7 @@ from functions.lib import *
 # depend on index date
 ######################
 
-def fn(dataset, index_date, suffix='', wp=None, earliest_date = None):
+def fn(dataset, index_date):
 
     '''
      and core variables that depend on index_date
@@ -22,10 +22,9 @@ def fn(dataset, index_date, suffix='', wp=None, earliest_date = None):
     # Filter raw data to everything 1 year before index date (can be changed if necessary)
     gp_events = filter_gp_events(index_date - years(1), index_date)
     apc_events = filter_apc_events(index_date - years(1), index_date)
-    med_events = filter_med_events(index_date - years(1), index_date)
+#    med_events = filter_med_events(index_date - years(1), index_date)
     
     # Smoking status
-    # two year lookback - can be changed
     last_smoking_former_date = last_matching_event_clinical_snomed(
         gp_events,
         smoking_former
@@ -56,12 +55,11 @@ def fn(dataset, index_date, suffix='', wp=None, earliest_date = None):
             )
         )
     
-    dataset.add_column('smoking' + suffix, case(
+    dataset.smoking = case(
             when(last_smoking_current == True).then("S"),
             when(last_smoking_former == True).then("E"),
             otherwise="N"
             )
-        )
 
     # # systolic BP
     # sysbp = last_matching_event_clinical_snomed(
@@ -80,12 +78,9 @@ def fn(dataset, index_date, suffix='', wp=None, earliest_date = None):
     # dataset.add_column('diasbp_value' + suffix, diasbp.numeric_value)
 
     # BMI
-    bmi = last_matching_event_clinical_snomed(
-        gp_events, 
-        bmi_cod)
+    bmi = last_matching_event_clinical_snomed(gp_events, bmi_cod)
 
-    dataset.add_column('bmi_date' + suffix, bmi.date)
-    dataset.add_column('bmi_value' + suffix, bmi.numeric_value)
+    dataset.bmi_value = bmi.numeric_value
 
     # # HDL cholesterol 
     # hdl_cholesterol = last_matching_event_clinical_snomed(
@@ -112,14 +107,15 @@ def fn(dataset, index_date, suffix='', wp=None, earliest_date = None):
         gp_events,
         bmi_obesity_snomed).date
 
-    dataset.add_column('obesity_primary_date' + suffix, obesity_primary_date)
-
     obesity_sus_date = last_matching_event_apc(
         apc_events,
         bmi_obesity_icd10 
         ).admission_date
 
-    dataset.add_column('obesity_sus_date' + suffix, obesity_sus_date)   
+    dataset.obesity = (
+        obesity_primary_date.is_not_null() | 
+        obesity_sus_date.is_not_null()
+        )
 
     # # weight
     # # Do we need to check icd10 codes ? 
@@ -146,7 +142,6 @@ def fn(dataset, index_date, suffix='', wp=None, earliest_date = None):
 
     # # only needed for WP4 (?) -- CHECK
     # if wp==4:
-
 
     #     # Hba1c latest for pcp-hf
     #     last_hba1c = last_matching_event_clinical_snomed(

@@ -36,7 +36,7 @@ def fn(dataset, earliest_date, index_date):
     dataset.learndis = last_matching_event_clinical_snomed(
             gp_events,
             learndis_primis
-            ).date
+            ).exists_for_patient()
     
     #severe mental illness
     smi_code = last_matching_event_clinical_snomed(

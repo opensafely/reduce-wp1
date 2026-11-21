@@ -1,0 +1,59 @@
+from ehrql.tables.tpp import (
+    patients,
+    practice_registrations,
+    )
+
+from ehrql import (
+    create_dataset,
+    years
+    )
+
+from functions.core import(
+    demog,
+    quality_assurance,
+    hf_exclude,
+    hf_diagnosis,
+    comorbidities
+    )
+
+dataset = create_dataset()
+
+#placeholder dates for now
+start_date = "2019-02-01"
+end_date = "2025-12-31"
+earliest_date = "2000-01-01"
+
+#demographic variables derived based on start_date
+dataset = demog.fn(dataset, start_date, end_date)
+
+#quality assurance
+dataset = quality_assurance.fn(dataset, earliest_date, end_date)
+
+#hf diagnosis
+dataset = hf_diagnosis.fn(dataset, start_date, end_date)
+
+#hf exclude 
+dataset = hf_exclude.fn(dataset, earliest_date, end_date)
+
+dataset = comorbidities.fn(dataset, earliest_date, end_date)
+
+has_registration = practice_registrations.where(
+        practice_registrations.start_date.is_on_or_before(end_date - years(1))
+    ).except_where(
+        practice_registrations.end_date.is_on_or_before(start_date)
+    ).exists_for_patient()
+
+dataset.define_population(
+    (has_registration)
+    & (patients.sex.is_in(['male','female'])) #known sex proxy for data quality
+    & (patients.date_of_birth.is_not_null()) #known dob proxy for data quality
+    & ~(patients.age_on(end_date) < 45) #remove pts < 45 at latest possible date
+    & ~(patients.age_on(start_date) >= 110) #remove pts age 110+ at earliest possible start date
+    & ((start_date < dataset.death_date) | (dataset.death_date.is_null())) #remove pts who died before start
+   # & ~((patients.sex == 'male') & (dataset.hrtcocp.is_not_null())) #remove males with hrt / cocp codes
+   # & ~((patients.sex == 'male') & (dataset.pregnancy.is_not_null())) #remove males with pregnancy codes
+   # & ~((patients.sex == 'female') & (dataset.prostate_cancer.is_not_null())) #remove females with prostate cancer codes
+)
+
+
+

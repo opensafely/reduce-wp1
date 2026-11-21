@@ -29,7 +29,6 @@ def fn(dataset, earliest_date, end_date):
         pregnancy_snomed
         ).date
 
-
     # COCP or HRT medication
     dataset.hrtcocp = last_matching_med_dmd(
         before_med_events,

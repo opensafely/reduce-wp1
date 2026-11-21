@@ -5,7 +5,7 @@ from functions.lib import *
 # independent of index date
 ##########################
 
-def fn(dataset, start_date, end_date='2025-02-01'):
+def fn(dataset, start_date, end_date):
 
     '''
     core variables don't differ between WPs
@@ -20,15 +20,17 @@ def fn(dataset, start_date, end_date='2025-02-01'):
 
     dataset.sex = patients.sex
     dataset.dob = patients.date_of_birth
-    
 
     # Ethnicity in 6 categories
     ethnicity_snomed = (
-        clinical_events.where(clinical_events.snomedct_code.is_in(ethnicity_codes))
+        clinical_events
+        .where(clinical_events.date.is_on_or_before(end_date))
+        .where(clinical_events.snomedct_code.is_in(ethnicity_codes))
         .sort_by(clinical_events.date)
         .last_for_patient()
         .snomedct_code.to_category(ethnicity_codes)
         )
+    dataset.ethnicity_primary = ethnicity_snomed
 
     ethnicity_sus = ethnicity_from_sus.code
 

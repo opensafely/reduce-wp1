@@ -45,6 +45,7 @@ full_cohort = table_from_file(
 )
 
 # add columns to year-specific cohorts
+dataset.death_date = full_cohort.death_date
 dataset.hf_exclude_date = full_cohort.hf_exclude_date
 dataset.sex = full_cohort.sex
 dataset.dob = full_cohort.dob

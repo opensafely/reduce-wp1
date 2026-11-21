@@ -22,20 +22,20 @@ run_wp1_checks <- function(input_file, cohort) {
       )
     ) 
 
-  factor_vars <- c("region", "imd_quintile", "rural", "smoking", "died_during_study",
+  factor_vars <- c("region", "imd_decile", "rural", "smoking", "died_during_study",
                    "migrant", "non_english_speaking", "smi", "substance_abuse", "homeless",
-                   "learndisability", "housebound", "sex", "hf_diagnosis_primary",
+                   "learndis", "housebound", "sex", "hf_diagnosis_primary",
                    "hf_diagnosis_emerg", "hf_diagnosis_any", "ethnicity_cat", "copd",
-                   "bmi_cat", "hypertension", "af", "ihd", "ckd", "t2dm", "age_group",
+                   "bmi_cat", "obese", "hypertension", "af", "ihd", "ckd", "t2dm", "age_group",
                    "bmi_missing")
 
   # Frequency distribution for categorical variables
   vars <- unique(c("hf_diagnosis_emerg","hf_diagnosis_any","sex", "region", "imd_quintile", 
-                    "rural", "rural_urban", "smoking",
-                   "migrant", "non_english_speaking", "smi", "substance_abuse", "homeless",
-                   "ethnicity_cat", "copd", "hypertension", "af", "ihd", "ckd", "t2dm", "t1dm",
-                   "age_group", "learndisability", "learndis", "housebound",
-                   "died_during_study", "died_before_index", "bmi_missing", "bmi_cat"))
+                    "rural", "smoking", "migrant", "non_english_speaking", "smi", "substance_abuse", "homeless",
+                   "ethnicity_cat", "copd", "hypertension", "af", "ihd", "ckd", "t2dm", 
+                   "age_group", "learndis", "housebound", 
+                   "died_during_study", "died_before_index", "bmi_missing", "bmi_cat", "obese"))
+  
   vars <- intersect(vars, names(wp1_checks))
 
   capture.output(

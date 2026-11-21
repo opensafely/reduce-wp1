@@ -5,17 +5,18 @@ clean.fn <- function(df, start_date, num_years){
     mutate(
       followup_end_date = 
         pmin(death_date, 
-            practice_deregistration_date, 
+            reg_end_date, 
             start_date + years(num_years),
             as.Date("2025-12-31"), 
-            na.rm= TRUE),
-      start_date = as.Date(start_date)
-           ) %>%
-    filter( 
-      !coalesce(sex == "male" & hrtcocp == TRUE, FALSE) &
-      !coalesce(sex == "male" & pregnancy == TRUE, FALSE) &
-      !coalesce(sex == "female" & prostate_cancer == TRUE, FALSE) &
-      followup_end_date >= start_date) %>%
+            na.rm = TRUE),
+      start_date = as.Date(start_date),
+      across(ends_with("_date"), as.Date),
+      across(all_of(c("t2dm","copd","af","ihd","ckd","carehome_at_index",
+                      "migrant","non_english_speaking","learndis","smi",
+                      "substance_abuse_1yr","homeless_1yr","housebound_1yr",
+                      "obesity")), ~ replace_na(.x, FALSE))
+    ) %>%
+    filter(followup_end_date >= start_date) %>%
     mutate( 
            age_group = case_when(
              45<=age & age<55 ~ "45-54 years",
@@ -24,54 +25,19 @@ clean.fn <- function(df, start_date, num_years){
              75<=age & age<85 ~ "75-84 years",
              85<=age ~ ">=85 years"
            ),
+           
+           imd_quintile = case_when(
+             imd_decile <= 2 ~ 1,
+             imd_decile >= 3 & imd_decile <= 4 ~ 2,
+             imd_decile >= 5 & imd_decile <= 6 ~ 3,
+             imd_decile >= 7 & imd_decile <= 8 ~ 4,
+             imd_decile >= 9 & imd_decile <= 10 ~ 5,
+             .default = NA
+           ),
 
            person_days = as.numeric(as.Date(followup_end_date) - as.Date(start_date)),
 
-      # create flags for whether people had condition on analysis start date
-           copd = coalesce(first_copd_date < start_date, FALSE),
-
-           hypertension = coalesce(
-             (hypertension_date_primary < start_date) |
-               (hypertension_date_sus < start_date) |
-               ((hypertension_date_med < start_date) & 
-                  (hypertension_date_med >= start_date - years(1))), 
-               FALSE
-              ),
-
-           af = coalesce(
-             (af_date_primary < start_date) |
-               (af_date_sus < start_date),
-               FALSE
-           ),
-
-           ihd = coalesce(
-             (ihd_date_primary < start_date) |
-               (ihd_date_sus < start_date),
-                FALSE
-           ),
-
-           ckd = coalesce(
-             (ckd_date_primary < start_date) |
-               (ckd_date_sus < start_date),
-               FALSE
-           ),
-
-           t2dm = coalesce(
-             (t2dm_date < start_date),
-               FALSE
-           ),
-
-           learndisability = coalesce(
-             (learndis < start_date),
-             FALSE
-           ),
-
-           bmi = as.numeric(
-             ifelse((bmi_date < start_date) &
-                    (bmi_date >= (start_date - years(2))) &
-                    (bmi_value < 60), 
-                    bmi_value, NA) 
-           ),
+           bmi = as.numeric(ifelse(bmi_value < 60, bmi_value, NA)),
            bmi_missing = ifelse(is.na(bmi), "Yes", "No"),
            bmi_cat =
              case_when(
@@ -81,6 +47,7 @@ clean.fn <- function(df, start_date, num_years){
                !is.na(bmi) & bmi >= 10 & bmi < 20 ~ "Underweight",
                .default = "Missing"
              ),
+           obese = coalesce((bmi_cat == "Obese" | obesity == TRUE), FALSE),
            rural = coalesce(rural_urban >=5 & !is.na(rural_urban), FALSE),
 
            # outcomes
@@ -125,45 +92,18 @@ clean.fn <- function(df, start_date, num_years){
             FALSE
            ),
 
-           hf_diagnosis_any_date = 
-              case_when(
-                hf_diagnosis_any == FALSE ~ as.Date(NA),
-                hf_diagnosis_any == TRUE & hf_diagnosis_emerg == TRUE 
-                  & hf_diagnosis_ec < hf_diagnosis_primary ~ hf_diagnosis_emerg_date,
-                hf_diagnosis_any == TRUE & hf_diagnosis_primary == TRUE 
-                  & hf_diagnosis_ec > hf_diagnosis_primary ~ hf_diagnosis_primary_date,
-                .default = as.Date(NA)
-            ),
-
            hf_diagnosis_type = case_when(
-                is.na(hf_diagnosis_any_date) ~ "No diagnosis",
-                hf_diagnosis_emerg_date == hf_diagnosis_any_date ~ "Emergency diagnosis",
-                hf_diagnosis_primary_date == hf_diagnosis_any_date ~ "Primary care diagnosis"
+                is.na(hf_diagnosis_any) ~ "No diagnosis",
+                hf_diagnosis_emerg_date < hf_diagnosis_primary_date ~ "Emergency diagnosis",
+                hf_diagnosis_primary_date < hf_diagnosis_emerg_date ~ "Primary care diagnosis"
            ),
 
           patient_end_date = pmin(death_date, 
-                                   practice_deregistration_date, 
+                                   reg_end_date, 
                                    hf_diagnosis_primary_date,
                                    hf_diagnosis_emerg_date,
                                    start_date + years(num_years),
                                    as.Date("2025-12-31"), 
                                    na.rm= TRUE)
-    ) %>%
-    select(!c(first_copd_date, hypertension_date_primary,
-              hypertension_date_med, hypertension_date_sus, af_date_primary,
-              af_date_sus, ihd_date_primary, ihd_date_sus, ckd_date_primary,
-              ckd_date_sus, t2dm_date, bmi_date, obesity_primary_date,
-              obesity_sus_date, learndis, bmi_value, prostate_cancer, pregnancy, 
-              hrtcocp, tmp_copd_date_primary, tmp_copd_date_sus,
-              otherdm_date, gestationaldm_date, t1dm_date, practice_id, practice_stp,
-              msoa, sysbp_date, sysbp_value, diasbp_date, diasbp_value,
-              last_hdl_cholesterol_date, last_hdl_cholesterol_value,
-              last_cholesterol_date, last_cholesterol_value, weight, 
-              weight_date, height, carehome_at_index, household_size,
-              tmp_antidiabetic_drugs_dmd_date, tmp_diabetes_medication_date,
-              tmp_first_diabetes_diag_date, tmp_insulin_dmd_date,
-              tmp_nonmetform_drugs_dmd_date, tmp_poccdm_date,
-              practice_registration_date, hf_exclude_date,
-              hf_diagnosis_ec_date, tmp_t2dm_count_num, tmp_poccdm_ctv3_count_num,
-              )) 
+    ) 
 }

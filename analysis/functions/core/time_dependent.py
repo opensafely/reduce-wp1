@@ -20,9 +20,9 @@ def fn(dataset, index_date):
     '''
 
     # Filter raw data to everything 1 year before index date (can be changed if necessary)
-    gp_events = filter_gp_events(index_date - years(1), index_date)
-    apc_events = filter_apc_events(index_date - years(1), index_date)
-#    med_events = filter_med_events(index_date - years(1), index_date)
+    gp_events = filter_gp_events(index_date - years(2), index_date)
+    apc_events = filter_apc_events(index_date - years(2), index_date)
+#   med_events = filter_med_events(index_date - years(1), index_date)
     
     # Smoking status
     last_smoking_former_date = last_matching_event_clinical_snomed(

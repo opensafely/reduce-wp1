@@ -103,18 +103,13 @@ def fn(dataset, index_date):
     # dataset.add_column('last_cholesterol_value' + suffix, cholesterol.numeric_value)
 
     # Obesity
-    obesity_primary_date = last_matching_event_clinical_snomed(
-        gp_events,
-        bmi_obesity_snomed).date
-
-    obesity_sus_date = last_matching_event_apc(
-        apc_events,
-        bmi_obesity_icd10 
-        ).admission_date
-
     dataset.obesity = (
-        obesity_primary_date.is_not_null() | 
-        obesity_sus_date.is_not_null()
+        last_matching_event_clinical_snomed(
+            gp_events,
+            bmi_obesity_snomed).exists_for_patient() | 
+        last_matching_event_apc(
+            apc_events,
+            bmi_obesity_icd10).exists_for_patient()
         )
 
     # # weight

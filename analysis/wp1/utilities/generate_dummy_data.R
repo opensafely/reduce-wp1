@@ -9,7 +9,7 @@ library(tidyr)
 
 set.seed(2026)
 
-n <- 10000
+n <- 50000
 years <- 2019:2025
 dir.create("output", showWarnings = FALSE, recursive = TRUE)
 
@@ -122,6 +122,11 @@ for (yr in years) {
       reg_start_date = index_date %m-% years(2),
       reg_end_date = as.Date("2025-12-31"),
 
+      region = sample(
+        c("North East", "North West", "Yorkshire and The Humber", "East Midlands", 
+            "West Midlands", "East", "London", "South East", "South West", NA_character_),
+            prob = c(rep(.106, 9), .05), n(), TRUE
+      ),
       imd_decile = sample(
         c("1 (most deprived)", "2", "3", "4", "5", "6", "7", "8", "9", "10 (least deprived)", "unknown"),
         prob = c(rep(.097, 10), .03), n(), TRUE
@@ -162,7 +167,9 @@ for (yr in years) {
       ihd = !is.na(first_ihd_date) &
         first_ihd_date < index_date,
       ckd = !is.na(first_ckd_date) &
-        first_ckd_date < index_date
+        first_ckd_date < index_date,
+      hypertension = !is.na(first_hypertension_date) &
+        first_hypertension_date < index_date
     )
   
   annual <- annual %>%
@@ -189,4 +196,4 @@ for (yr in years) {
   )
 }
 
-message("Synthetic WP1 dataset generation complete.")
+message("Dummy WP1 dataset generation complete.")

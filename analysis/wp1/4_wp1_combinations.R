@@ -16,11 +16,15 @@ source(here::here("analysis", "wp1", "utilities", "other_functions.R"))
 wp1_main <- read_csv(here::here("output","wp1","wp1_main.csv"))
 
 for_combos <- wp1_main %>%
+#  filter(hf_diagnosis_type == "Emergency diagnosis") %>%
   mutate(age_1 = (age_group == "45-54 years"),
          age_2 = (age_group == "55-64 years"),
          age_3 = (age_group == "65-74 years"),
          age_4 = (age_group == "75-84 years"),
          age_5 = (age_group == ">=85 years"),
+         
+         age_older = (age>= 65),
+         age_younger = (age < 65),
          
          eth_white = (ethnicity_cat == "White"),
          eth_nonwhite = (ethnicity_cat %in% c("Black","Asian","Mixed","Other")),
@@ -36,6 +40,8 @@ for_combos <- wp1_main %>%
          bmi_underweight = (bmi_cat == "Underweight"),
          bmi_missing = (bmi_cat == "Missing"),
          
+         bmi_nonobese = (!(bmi_cat %in% c("Obese","Overweight","Normal","Underweight","Missing"))),
+         
          region_london = (region == "London"),
          region_neast = (region == "North East"),
          region_nwest = (region == "North West"),
@@ -50,27 +56,56 @@ for_combos <- wp1_main %>%
          
          smok_never = (smoking == "N"),
          smok_ever = (smoking == "E"),
-         smok_curr = (smoking == "C"))
+         smok_curr = (smoking == "C"),
          
-  
+         imd_lowest = coalesce((imd_quintile == "1 (most deprivation)"), FALSE)
+         )
+         
+#copd <- for_combos %>% subset(copd == TRUE)
 
-copd <- for_combos %>% subset(copd == TRUE)
+factors <- c("imd_lowest", 
+             "rural", 
+             "non_english_speaking", 
+             "male",
+             "hypertension", "af", "ihd", "ckd", "t2dm", "copd",
+             "age_older", 
+             "eth_nonwhite", 
+             "bmi_obese")
 
 combos <- for_combos %>%
-  group_by(across(c(imd_quintile, rural, 
-                    migrant, non_english_speaking, smi, 
-                    substance_abuse, homeless,
-                    learndisability, housebound, male,
-                    hypertension, af, ihd, ckd, t2dm, 
-                    age_1, age_2, age_3, age_4, age_5,
-                    eth_white, eth_nonwhite, 
-                    bmi_obese, bmi_overweight, bmi_underweight))) %>%
+  group_by(across(all_of(factors))) %>%
   summarise(pop = rounding(n()),
-            pdays =  sum(person_days , na.rm = TRUE), 
-            hf_emerg = rounding(sum(hf_diagnosis_type == "Emergency diagnosis", na.rm = TRUE)),
-            .groups = "drop") %>%
-  distinct() %>%
-  subset(pop > 100)
+            pdays =  rounding(sum(person_days, na.rm = TRUE)), 
+            numerator = rounding(sum(hf_diagnosis_type == "Emergency", na.rm = TRUE)),
+            .groups = "drop") %>% 
+  #filter(pop > 100) %>%
+  rowwise() %>%
+  mutate(
+    factor_names = list(
+      factors[which(unlist(pick(all_of(factors))) == TRUE)]
+    )) %>%
+  ungroup() %>%
+  mutate(
+  rate_ptime = numerator / pdays * 1000,
+  rate_per_1000 = numerator / pop * 1000
+  ) 
 
 write.csv(combos, here::here("output", "wp1", "wp1_combinations.csv"), row.names = FALSE)
+
+
+
+# ggplot(
+#   combos,
+#   aes(x = factor_names, y = rate_ptime)
+#   ) +
+#   geom_col() +
+#   scale_x_upset(
+#     n_intersections = 20
+#   ) +
+#   labs(
+#     x = "Comorbidity combinations",
+#     y = "Number of patients",
+#     title = "Overlap of comorbidities"
+#   ) +
+#   theme_minimal()
 

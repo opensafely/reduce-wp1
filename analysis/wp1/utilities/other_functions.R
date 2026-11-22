@@ -108,7 +108,7 @@ create.table <- function(df){
 create.cont <- function(df){
 
   table_cont <- df %>%
-    select(hf_diag_short, cont_vars) %>%
+    select(hf_diag_short, all_of(cont_vars)) %>%
     group_by(hf_diag_short) %>%
     summarise(
       across(

@@ -65,6 +65,7 @@ dataset.copd = (full_cohort.first_copd_date.is_before(cohort_index_date))
 dataset.af = (full_cohort.first_af_date.is_before(cohort_index_date))
 dataset.ihd = (full_cohort.first_ihd_date.is_before(cohort_index_date))
 dataset.ckd = (full_cohort.first_ckd_date.is_before(cohort_index_date))
+dataset.hypertension = (full_cohort.first_hypertension_date.is_before(cohort_index_date))
 
 #hf diagnosis
 dataset = time_dependent.fn(dataset, cohort_index_date)
@@ -89,6 +90,7 @@ dataset.age = patients.age_on(cohort_index_date)
 patient_address = addresses.for_patient_on(cohort_index_date)
 dataset.imd_decile = patient_address.imd_decile
 dataset.rural_urban = addresses.for_patient_on(cohort_index_date).rural_urban_classification
+dataset.region = registrations.practice_nuts1_region_name
 
 dataset.define_population(
     registrations.exists_for_patient()

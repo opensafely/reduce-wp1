@@ -19,6 +19,7 @@ actions:
   
   generate_dataset_wp1_common:
     run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_common.py --output output/dataset_wp1_common.csv.gz
+      --dummy-data-file analysis/dummy_data/dummy_dataset_wp1_common.csv.gz
     outputs:
       highly_sensitive:
         dataset: output/dataset_wp1_common.csv.gz
@@ -38,6 +39,7 @@ actions:
 
   generate_dataset_wp1_2019:
     run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2019.csv.gz
+      --dummy-data-file analysis/dummy_data/dummy_dataset_wp1_2019.csv.gz
       -- --cohort_index_date "2019-02-01"
     needs: [generate_dataset_wp1_common]
     outputs:
@@ -46,6 +48,7 @@ actions:
 
   generate_dataset_wp1_2020:
     run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2020.csv.gz
+      --dummy-data-file analysis/dummy_data/dummy_dataset_wp1_2020.csv.gz
       -- --cohort_index_date "2020-02-01"
     needs: [generate_dataset_wp1_common]
     outputs:
@@ -54,6 +57,7 @@ actions:
 
   generate_dataset_wp1_2021:
     run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2021.csv.gz
+      --dummy-data-file analysis/dummy_data/dummy_dataset_wp1_2021.csv.gz
       -- --cohort_index_date "2021-02-01"
     needs: [generate_dataset_wp1_common]
     outputs:
@@ -62,6 +66,7 @@ actions:
 
   generate_dataset_wp1_2022:
     run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2022.csv.gz
+      --dummy-data-file analysis/dummy_data/dummy_dataset_wp1_2022.csv.gz
       -- --cohort_index_date "2022-02-01"
     needs: [generate_dataset_wp1_common]
     outputs:
@@ -70,6 +75,7 @@ actions:
 
   generate_dataset_wp1_2023:
     run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2023.csv.gz
+      --dummy-data-file analysis/dummy_data/dummy_dataset_wp1_2023.csv.gz
       -- --cohort_index_date "2023-02-01"
     needs: [generate_dataset_wp1_common]
     outputs:
@@ -78,6 +84,7 @@ actions:
         
   generate_dataset_wp1_2024:
     run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2024.csv.gz
+      --dummy-data-file analysis/dummy_data/dummy_dataset_wp1_2024.csv.gz
       -- --cohort_index_date "2024-02-01"
     needs: [generate_dataset_wp1_common]
     outputs:
@@ -86,6 +93,7 @@ actions:
         
   generate_dataset_wp1_2025:
     run: ehrql:v1 generate-dataset analysis/dataset_definition_wp1_time_dep.py --output output/dataset_wp1_2025.csv.gz
+      --dummy-data-file analysis/dummy_data/dummy_dataset_wp1_2025.csv.gz
       -- --cohort_index_date "2025-02-01"
     needs: [generate_dataset_wp1_common]
     outputs:

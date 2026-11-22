@@ -109,7 +109,7 @@ actions:
       moderately_sensitive:
         csv: output/wp1/checks/main/check_*.csv
         figs: output/wp1/checks/main/figures/*.png
-        txt: output/wp1/checks/main/skim.txt
+        txt: output/wp1/checks/main/skim*.txt
    
   wp1_processing_ts:
     run: r:v2 analysis/wp1/1_wp1_processing_ts.R

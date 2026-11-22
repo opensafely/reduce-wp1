@@ -11,7 +11,7 @@ clean.fn <- function(df, start_date, num_years){
             na.rm = TRUE),
       start_date = as.Date(start_date),
       across(ends_with("_date"), as.Date),
-      across(all_of(c("t2dm","copd","af","ihd","ckd","carehome_at_index",
+      across(all_of(c("t2dm","copd","af","ihd","ckd","hypertension","carehome_at_index",
                       "migrant","non_english_speaking","learndis","smi",
                       "substance_abuse_1yr","homeless_1yr","housebound_1yr",
                       "obesity")), ~ replace_na(.x, FALSE))
@@ -25,6 +25,21 @@ clean.fn <- function(df, start_date, num_years){
              75<=age & age<85 ~ "75-84 years",
              85<=age ~ ">=85 years"
            ),
+           
+           age_5yrs = cut(
+             age,
+             breaks = c(seq(0, 90, by = 5), Inf),
+             labels = c(
+               paste0(
+                 seq(0, 85, by = 5), "-",
+                 seq(4, 89, by = 5)
+               ),
+               "90+"
+             ),
+             right = FALSE
+           ),
+           
+           ethnicity_primary = as.character(ethnicity_primary),
            
            imd_quintile = case_when(
              imd_decile %in% c("1 (most deprived)", "2") ~ "1 (most deprived)",

@@ -27,12 +27,12 @@ clean.fn <- function(df, start_date, num_years){
            ),
            
            imd_quintile = case_when(
-             imd_decile <= 2 ~ 1,
-             imd_decile >= 3 & imd_decile <= 4 ~ 2,
-             imd_decile >= 5 & imd_decile <= 6 ~ 3,
-             imd_decile >= 7 & imd_decile <= 8 ~ 4,
-             imd_decile >= 9 & imd_decile <= 10 ~ 5,
-             .default = NA
+             imd_decile %in% c("1 (most deprived)", "2") ~ "1 (most deprived)",
+             imd_decile %in% c("3","4") ~ "2",
+             imd_decile %in% c("5","6") ~ "3",
+             imd_decile %in% c("7","8") ~ "4",
+             imd_decile %in% c("9","10 (least deprived)") ~ "5 (least deprived)",
+             .default = NA_character_
            ),
 
            person_days = as.numeric(as.Date(followup_end_date) - as.Date(start_date)),

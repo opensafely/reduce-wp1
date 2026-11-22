@@ -1,6 +1,6 @@
 
 # run data checks for either dataset, saving outputs separately
-run_wp1_checks <- function(input_file, cohort) {
+run_wp1_checks <- function(input_file, cohort, year) {
 
   check_dir <- here::here("output", "wp1", "checks", cohort)
 
@@ -8,7 +8,7 @@ run_wp1_checks <- function(input_file, cohort) {
   dir_create(file.path(check_dir, "figures"), recurse = TRUE)
 
   # read in cleaned data
-  wp1_checks <- read_csv(input_file) %>%
+  wp1_checks <- read_csv(input_file, show_col_types = FALSE) %>%
     mutate(death_date = as.Date(death_date),
       start_date = as.Date(start_date),
       time_index_to_death = as.numeric(
@@ -23,24 +23,25 @@ run_wp1_checks <- function(input_file, cohort) {
     ) 
 
   factor_vars <- c("region", "imd_decile", "rural", "smoking", "died_during_study",
-                   "migrant", "non_english_speaking", "smi", "substance_abuse", "homeless",
-                   "learndis", "housebound", "sex", "hf_diagnosis_primary",
+                   "migrant", "non_english_speaking", "smi", "substance_abuse_1yr", "homeless_1yr",
+                   "learndis", "housebound_1yr", "sex", "hf_diagnosis_primary",
                    "hf_diagnosis_emerg", "hf_diagnosis_any", "ethnicity_cat", "copd",
                    "bmi_cat", "obese", "hypertension", "af", "ihd", "ckd", "t2dm", "age_group",
                    "bmi_missing")
 
   # Frequency distribution for categorical variables
   vars <- unique(c("hf_diagnosis_emerg","hf_diagnosis_any","sex", "region", "imd_quintile", 
-                    "rural", "smoking", "migrant", "non_english_speaking", "smi", "substance_abuse", "homeless",
+                    "rural", "smoking", "migrant", "non_english_speaking", "smi", "substance_abuse_1yr",
+                    "homeless_1yr",
                    "ethnicity_cat", "copd", "hypertension", "af", "ihd", "ckd", "t2dm", 
-                   "age_group", "learndis", "housebound", 
+                   "age_group", "learndis", "housebound_1yr", 
                    "died_during_study", "died_before_index", "bmi_missing", "bmi_cat", "obese"))
   
   vars <- intersect(vars, names(wp1_checks))
 
   capture.output(
     skimr::skim_without_charts(wp1_checks),
-    file = here::here("output", "wp1", "checks", cohort, "skim.txt"),
+    file = here::here("output", "wp1", "checks", cohort, paste0("skim_", year, ".txt")),
     split = FALSE
   )
   
@@ -66,7 +67,7 @@ run_wp1_checks <- function(input_file, cohort) {
     names_glue = "{.value}_{year}"
   )
 
-  write.csv(categorical_freq, file.path(check_dir, "check_categorical_dist.csv"))
+  write.csv(categorical_freq, file.path(check_dir, paste0("check_categorical_dist_", year, ".csv")))
 
   # Summary statistics/histograms for continuous variables
   is_continuous <- function(x) {
@@ -112,7 +113,7 @@ run_wp1_checks <- function(input_file, cohort) {
         ) %>%
         arrange(variable)
 
-  write.csv(continuous_summ, file.path(check_dir, "check_summary_stats.csv"))
+  write.csv(continuous_summ, file.path(check_dir, paste0("check_summary_stats_", year, ".csv")))
 
   # Histograms
   continuous_data <- wp1_checks %>%
@@ -189,7 +190,7 @@ run_wp1_checks <- function(input_file, cohort) {
     ) %>%
     arrange(variable)
 
-  write.csv(dates_summ, file.path(check_dir, "check_dates.csv"))
+  write.csv(dates_summ, file.path(check_dir, paste0("check_dates_", year, ".csv")))
 
   # Histogram for continuous vars
   plots <- wp1_checks %>%
@@ -214,7 +215,7 @@ run_wp1_checks <- function(input_file, cohort) {
   }
 
   for (v in names(plots)) {
-    filename <- paste0("plot_", v, ".png")
+    filename <- paste0("plot_", v, "_", year, ".png")
   
     ggsave(filename = file.path(check_dir, "figures", filename),
            plot = plots[[v]],

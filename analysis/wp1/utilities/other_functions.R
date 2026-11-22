@@ -8,7 +8,7 @@ rounding <- function(vars) {
 
 # merge common variables to year-specific cohorts
 merge.fn <- function(year) {
-
+                        
   readr::read_csv(
     paste0("output/dataset_wp1_", year, ".csv.gz"),
     show_col_types = FALSE
@@ -16,30 +16,29 @@ merge.fn <- function(year) {
     inner_join(
       wp1_common,
       by = "patient_id",
-      relationship = "one-to-one",
-      suffix = c("", "_common")
-    ) %>%
+      relationship = "one-to-one") %>%
+    mutate(start_date = as.Date(paste0(year, "-02-01"))) %>%
+    filter(
+      (is.na(death_date) | (death_date >= start_date)) &
+      (is.na(hf_exclude_date) | (hf_exclude_date >= start_date))
+       )%>%
+    mutate(t2dm = coalesce(first_t2dm_date < start_date, FALSE),
+      copd = coalesce(first_copd_date < start_date, FALSE),
+      af = coalesce(first_af_date < start_date, FALSE),
+      ihd = coalesce(first_ihd_date < start_date, FALSE),
+      ckd = coalesce(first_ckd_date < start_date, FALSE),
+      hypertension = coalesce(first_hypertension_date < start_date, FALSE)) %>%
     select(
       -any_of(c(
         "prostate_cancer", "pregnancy", "hrtcocp",
-        "tmp_copd_date_primary", "tmp_copd_date_sus",
-        "otherdm_date", "gestationaldm_date",
-        "t1dm_date", "practice_id", "practice_stp",
-        "msoa", "sysbp_date", "sysbp_value",
-        "diasbp_date", "diasbp_value",
-        "last_hdl_cholesterol_date",
-        "last_hdl_cholesterol_value",
-        "last_cholesterol_date",
-        "last_cholesterol_value",
-        "weight", "weight_date", "height",
-        "carehome_at_index", 
-        "household_size"
+        "first_t2dm_date","first_copd_date","first_af_date","first_ihd_date",
+        "first_ckd_date","first_hypertension_date"
       ))
       )
 }
 
 
-# min / max/ quantile funcations that appropriately deal with missing
+# min / max/ quantile functions that appropriately deal with missing
 safe_min <- function(x) {
   if (all(is.na(x))) return(x[NA_integer_][1])
   min(x, na.rm = TRUE)
@@ -69,9 +68,10 @@ summarise_hf <- function(data, ...) {
       hf_ae      = rounding(sum(hf_diagnosis_ec       == TRUE, na.rm = TRUE)),
       hf_death   = rounding(sum(hf_death              == TRUE, na.rm = TRUE)),
       pop        = rounding(n()),
+      pdays  = rounding(sum(person_days)),
       .groups    = "drop"
     ) %>%
-    select(year, !!!group_vars, hf_emerg, hf_primary, hf_any, pop) %>%
+    select(year, !!!group_vars, hf_emerg, hf_primary, hf_any, pop, pdays) %>%
     mutate(
       hf_emerg_rate   = hf_emerg   / pop * 100000,
       hf_primary_rate = hf_primary / pop * 100000,

@@ -9,7 +9,7 @@ library(tidyr)
 
 set.seed(2026)
 
-n <- 50000
+n <- 10000
 years <- 2019:2025
 dir.create("output", showWarnings = FALSE, recursive = TRUE)
 
@@ -113,9 +113,9 @@ for (yr in years) {
   annual <- common %>%
     filter(
       dob %m+% years(45) <= index_date,
-      dob %m+% years(110) > index_date,
-      is.na(death_date) | death_date > index_date,
-      is.na(hf_exclude_date) | hf_exclude_date > index_date
+      dob %m+% years(110) > index_date
+     # is.na(death_date) | death_date > index_date,
+     # is.na(hf_exclude_date) | hf_exclude_date > index_date
     ) %>%
     mutate(
       age = floor(time_length(interval(dob, index_date), "years")),
@@ -157,19 +157,6 @@ for (yr in years) {
       substance_abuse_1yr = runif(n()) < .045,
       homeless_1yr = runif(n()) < .015,
       housebound_1yr = runif(n()) < .06,
-
-      t2dm = !is.na(first_t2dm_date) &
-        first_t2dm_date < index_date,
-      copd = !is.na(first_copd_date) &
-        first_copd_date < index_date,
-      af = !is.na(first_af_date) &
-        first_af_date < index_date,
-      ihd = !is.na(first_ihd_date) &
-        first_ihd_date < index_date,
-      ckd = !is.na(first_ckd_date) &
-        first_ckd_date < index_date,
-      hypertension = !is.na(first_hypertension_date) &
-        first_hypertension_date < index_date
     )
   
   annual <- annual %>%
@@ -188,11 +175,6 @@ for (yr in years) {
     annual,
     sprintf("analysis/dummy_data/dummy_dataset_wp1_%s.csv.gz", yr),
     na = ""
-  )
-
-  message(
-    "Generated ", filename,
-    " (", nrow(annual), " patients)"
   )
 }
 

@@ -66,3 +66,4 @@ create.table(imd_lowest) %>%
   write.csv(here::here("output", "wp1", "tables", "wp1_imd_cat.csv"), row.names = FALSE)
 create.cont(imd_lowest) %>%
   write.csv(here::here("output", "wp1", "tables", "wp1_imd_cont.csv"), row.names = FALSE)
+

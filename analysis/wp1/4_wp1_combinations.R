@@ -17,7 +17,18 @@ wp1_main <- read_csv(here::here("output","wp1","wp1_main.csv"), show_col_types =
 
 for_combos <- wp1_main %>%
 #  filter(hf_diagnosis_type == "Emergency diagnosis") %>%
-  mutate(age_1 = (age_group == "45-54 years"),
+  mutate(hf_diag_short = case_when(
+              ((!is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date) &
+                  (hf_diagnosis_emerg_date < hf_diagnosis_primary_date)) |
+                 !is.na(hf_diagnosis_emerg_date) & is.na(hf_diagnosis_primary_date) |
+                 (hf_diagnosis_emerg_date == hf_diagnosis_primary_date)) ~ "emerg",
+              ((!is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date) &
+                  (hf_diagnosis_primary_date < hf_diagnosis_emerg_date)) |
+                 is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date)) ~ "primary",
+              is.na(hf_diagnosis_emerg_date) & is.na(hf_diagnosis_primary_date) ~ "none"
+            ),
+  
+         age_1 = (age_group == "45-54 years"),
          age_2 = (age_group == "55-64 years"),
          age_3 = (age_group == "65-74 years"),
          age_4 = (age_group == "75-84 years"),
@@ -79,9 +90,9 @@ combos <- for_combos %>%
   group_by(across(all_of(factors))) %>%
   summarise(pop = rounding(n()),
             pdays =  rounding(sum(person_days, na.rm = TRUE)), 
-            numerator = rounding(sum(hf_diagnosis_type == "Emergency diagnosis", na.rm = TRUE)),
+            numerator = rounding(sum(hf_diag_short == "emerg", na.rm = TRUE)),
             .groups = "drop") %>% 
-  #filter(pop > 100) %>%
+  filter(pop > 100) %>%
   rowwise() %>%
   mutate(
     factor_names = paste(
@@ -91,8 +102,8 @@ combos <- for_combos %>%
   ) %>%
   ungroup() %>%
   mutate(
-  rate_ptime = numerator / pdays * 1000,
-  rate_per_1000 = numerator / pop * 1000
+  rate_ptime = numerator / (pdays / 365.25) * 100000,
+  rate_per_1000 = numerator / pop * 100000
   ) 
 
 write.csv(combos, here::here("output", "wp1", "wp1_combinations.csv"), row.names = FALSE)

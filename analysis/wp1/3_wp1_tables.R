@@ -24,6 +24,11 @@ wp1_main <- read_csv(here::here("output","wp1","wp1_main.csv"), show_col_types =
   mutate(
     mltc = (rowSums(across(c(ckd, t2dm, obese, copd, hypertension, ihd))) >= 2),
     
+    hf_emerg_primary_same_date = coalesce(
+      (!is.na(hf_diagnosis_emerg_date) & 
+         !is.na(hf_diagnosis_primary_date) &
+         hf_diagnosis_emerg_date == hf_diagnosis_primary_date), FALSE),
+    
     across(c(migrant, non_english_speaking, smi, substance_abuse_1yr, homeless_1yr,
                   learndis, housebound_1yr, copd, died_during_study,
                   hypertension, obese,
@@ -35,22 +40,26 @@ wp1_main <- read_csv(here::here("output","wp1","wp1_main.csv"), show_col_types =
                   migrant, non_english_speaking, smi, substance_abuse_1yr, homeless_1yr,
                   learndis, housebound_1yr, sex, hf_diagnosis_primary, hf_diagnosis_emerg,
                   hf_diagnosis_any, ethnicity_cat, copd, hf_diagnosis_type, bmi_cat,
-                  hypertension, region, obese, imd_quintile,
+                  hypertension, region, obese, imd_quintile,hf_emerg_primary_same_date,
                   af, ihd, ckd, t2dm, age_group, bmi_missing, mltc), as.factor),
     
     hf_diag_short = case_when(
-      hf_diagnosis_type == "Emergency diagnosis" ~ "emerg",
-      hf_diagnosis_type == "Primary care diagnosis" ~ "prim",
-      hf_diagnosis_type == "No diagnosis" ~ "none",
-      is.na(hf_diagnosis_type) ~ "none")
-    
+      ((!is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date) &
+          (hf_diagnosis_emerg_date < hf_diagnosis_primary_date)) |
+         !is.na(hf_diagnosis_emerg_date) & is.na(hf_diagnosis_primary_date) |
+         (hf_diagnosis_emerg_date == hf_diagnosis_primary_date)) ~ "emerg",
+      ((!is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date) &
+          (hf_diagnosis_primary_date < hf_diagnosis_emerg_date)) |
+         is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date)) ~ "primary",
+      is.na(hf_diagnosis_emerg_date) & is.na(hf_diagnosis_primary_date) ~ "none"
+    )
     )  
 
 cat_vars <- c("sex", "imd_quintile", "rural", "smoking",
-              #"region", "hypertension",
+              "region", "hypertension","hf_emerg_primary_same_date",
               "migrant", "non_english_speaking", "smi", "bmi_cat",
               "substance_abuse_1yr", "homeless_1yr", "ethnicity_cat",
-              "copd", "af", "ihd", "ckd", "t2dm",
+              "copd", "af", "ihd", "ckd", "t2dm", "mltc",
               "age_group", "learndis", "died_during_study",
               "bmi_missing")
 

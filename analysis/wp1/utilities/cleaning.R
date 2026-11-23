@@ -108,9 +108,16 @@ clean.fn <- function(df, start_date, num_years){
            ),
 
            hf_diagnosis_type = case_when(
-                is.na(hf_diagnosis_any) ~ "No diagnosis",
-                hf_diagnosis_emerg_date < hf_diagnosis_primary_date ~ "Emergency diagnosis",
-                hf_diagnosis_primary_date < hf_diagnosis_emerg_date ~ "Primary care diagnosis"
+                (
+                  (!is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date) &
+                  (hf_diagnosis_emerg_date < hf_diagnosis_primary_date)) |
+                  (!is.na(hf_diagnosis_emerg_date) & is.na(hf_diagnosis_primary_date)) |
+                  (hf_diagnosis_emerg_date == hf_diagnosis_primary_date)
+                 ) ~ "Emergency diagnosis",
+                ((!is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date) &
+                    (hf_diagnosis_primary_date < hf_diagnosis_emerg_date)) |
+                   is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date)) ~ "Primary care diagnosis",
+                is.na(hf_diagnosis_emerg_date) & is.na(hf_diagnosis_primary_date) ~ "No diagnosis"
            ),
 
           patient_end_date = pmin(death_date, 

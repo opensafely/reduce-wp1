@@ -196,16 +196,16 @@ actions:
         csv: output/wp1/wp1_timeseries.csv
         plot: output/wp1/figures/plot*.png
 
-  # wp1_tables:
-  #   run: r:v2 analysis/wp1/3_wp1_tables.R 
-  #   needs: [wp1_processing_main]
-  #   outputs:
-  #     moderately_sensitive:
-  #       csv: output/wp1/tables/wp1_*.csv
+  wp1_tables:
+    run: r:v2 analysis/wp1/3_wp1_tables.R 
+    needs: [wp1_processing_main]
+    outputs:
+      moderately_sensitive:
+        csv: output/wp1/tables/wp1_*.csv
 
-  # wp1_combinations:
-  #   run: r:v2 analysis/wp1/4_wp1_combinations.R 
-  #   needs: [wp1_processing]
-  #   outputs:
-  #     moderately_sensitive:
-  #       csv: output/wp1/wp1_combinations.csv
+  wp1_combinations:
+    run: r:v2 analysis/wp1/4_wp1_combinations.R 
+    needs: [wp1_processing_main]
+    outputs:
+      moderately_sensitive:
+        csv: output/wp1/wp1_combinations.csv

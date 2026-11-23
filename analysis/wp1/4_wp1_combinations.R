@@ -13,7 +13,7 @@ library('gt')
 ## Custom functions
 source(here::here("analysis", "wp1", "utilities", "other_functions.R"))
 
-wp1_main <- read_csv(here::here("output","wp1","wp1_main.csv"))
+wp1_main <- read_csv(here::here("output","wp1","wp1_main.csv"), show_col_types = FALSE)
 
 for_combos <- wp1_main %>%
 #  filter(hf_diagnosis_type == "Emergency diagnosis") %>%
@@ -40,7 +40,7 @@ for_combos <- wp1_main %>%
          bmi_underweight = (bmi_cat == "Underweight"),
          bmi_missing = (bmi_cat == "Missing"),
          
-         bmi_nonobese = (!(bmi_cat %in% c("Obese","Overweight","Normal","Underweight","Missing"))),
+         bmi_nonobese = (!(bmi_cat %in% c("Obese"))),
          
          region_london = (region == "London"),
          region_neast = (region == "North East"),
@@ -58,7 +58,10 @@ for_combos <- wp1_main %>%
          smok_ever = (smoking == "E"),
          smok_curr = (smoking == "C"),
          
-         imd_lowest = coalesce((imd_quintile == "1 (most deprivation)"), FALSE)
+         imd_lowest = coalesce((imd_quintile == "1 (most deprived)"), FALSE),
+         
+         mltc = (rowSums(across(c(ckd, t2dm, bmi_obese, copd, hypertension, ihd))) >= 2)
+         
          )
          
 #copd <- for_combos %>% subset(copd == TRUE)
@@ -70,20 +73,22 @@ factors <- c("imd_lowest",
              "hypertension", "af", "ihd", "ckd", "t2dm", "copd",
              "age_older", 
              "eth_nonwhite", 
-             "bmi_obese")
+             "bmi_obese", "mltc")
 
 combos <- for_combos %>%
   group_by(across(all_of(factors))) %>%
   summarise(pop = rounding(n()),
             pdays =  rounding(sum(person_days, na.rm = TRUE)), 
-            numerator = rounding(sum(hf_diagnosis_type == "Emergency", na.rm = TRUE)),
+            numerator = rounding(sum(hf_diagnosis_type == "Emergency diagnosis", na.rm = TRUE)),
             .groups = "drop") %>% 
   #filter(pop > 100) %>%
   rowwise() %>%
   mutate(
-    factor_names = list(
-      factors[which(unlist(pick(all_of(factors))) == TRUE)]
-    )) %>%
+    factor_names = paste(
+      factors[which(unlist(pick(all_of(factors))) %in% TRUE)],
+      collapse = ", "
+    )
+  ) %>%
   ungroup() %>%
   mutate(
   rate_ptime = numerator / pdays * 1000,

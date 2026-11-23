@@ -84,7 +84,7 @@ create.table <- function(df){
   pdays <- df %>%
     pivot_longer(all_of(cat_vars), names_to = "variable", values_to = "value") %>%
     group_by(variable, value) %>%
-    summarise(pdays = as.numeric(sum(person_days)), .groups = "drop")
+    summarise(pdays = (rounding(as.numeric(sum(person_days)))), .groups = "drop")
 
   table_cat <- df %>%
     pivot_longer(all_of(cat_vars), names_to = "variable", values_to = "value") %>%

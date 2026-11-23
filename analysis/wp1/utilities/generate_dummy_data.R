@@ -9,7 +9,7 @@ library(tidyr)
 
 set.seed(2026)
 
-n <- 10000
+n <- 50000
 years <- 2019:2025
 dir.create("output", showWarnings = FALSE, recursive = TRUE)
 

@@ -107,7 +107,7 @@ combined <- ggarrange(a , b, nrow = 2)
 
 # Save plot
 ggsave(
-  here::here("output", "wp1","figures","plot_ts_age_sex.png"),
+  here::here("output", "wp1","figures","plots_ts_age_sex.png"),
   combined,
   width = 12,
   height = 10,

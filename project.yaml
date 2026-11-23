@@ -111,20 +111,86 @@ actions:
         figs: output/wp1/checks/main/figures/*.png
         txt: output/wp1/checks/main/skim*.txt
    
-  wp1_processing_ts:
-    run: r:v2 analysis/wp1/1_wp1_processing_ts.R
-    needs: [generate_dataset_wp1_common, generate_dataset_wp1_2019, generate_dataset_wp1_2020, generate_dataset_wp1_2021, generate_dataset_wp1_2022, generate_dataset_wp1_2023, generate_dataset_wp1_2024, generate_dataset_wp1_2025]
+  wp1_processing_ts_2019:
+    run: r:v2 analysis/wp1/1_wp1_processing_ts_2019.R
+    needs: [generate_dataset_wp1_common, generate_dataset_wp1_2019]
     outputs:
       highly_sensitive:
-        data: output/wp1/wp1_ts*.csv.gz
+        data: output/wp1/wp1_ts_2019.csv.gz
       moderately_sensitive:
         csv: output/wp1/checks/ts/*.csv
         figs: output/wp1/checks/ts/figures/*.png
-        txt: output/wp1/checks/ts/skim*.txt
-
+        txt: output/wp1/checks/ts/skim_2019.txt
+   
+  wp1_processing_ts_2020:
+    run: r:v2 analysis/wp1/1_wp1_processing_ts_2020.R
+    needs: [generate_dataset_wp1_common, generate_dataset_wp1_2020]
+    outputs:
+      highly_sensitive:
+        data: output/wp1/wp1_ts_2020.csv.gz
+      moderately_sensitive:
+        csv: output/wp1/checks/ts/c*.csv
+        figs: output/wp1/checks/ts/figures/p*.png
+        txt: output/wp1/checks/ts/skim_2020.txt
+     
+  wp1_processing_ts_2021:
+    run: r:v2 analysis/wp1/1_wp1_processing_ts_2021.R
+    needs: [generate_dataset_wp1_common, generate_dataset_wp1_2021]
+    outputs:
+      highly_sensitive:
+        data: output/wp1/wp1_ts_2021.csv.gz
+      moderately_sensitive:
+        csv: output/wp1/checks/ts/ch*.csv
+        figs: output/wp1/checks/ts/figures/pl*.png
+        txt: output/wp1/checks/ts/skim_2021.txt
+     
+  wp1_processing_ts_2022:
+    run: r:v2 analysis/wp1/1_wp1_processing_ts_2022.R
+    needs: [generate_dataset_wp1_common, generate_dataset_wp1_2022]
+    outputs:
+      highly_sensitive:
+        data: output/wp1/wp1_ts_2022.csv.gz
+      moderately_sensitive:
+        csv: output/wp1/checks/ts/che*.csv
+        figs: output/wp1/checks/ts/figures/plo*.png
+        txt: output/wp1/checks/ts/skim_2022.txt
+     
+  wp1_processing_ts_2023:
+    run: r:v2 analysis/wp1/1_wp1_processing_ts_2023.R
+    needs: [generate_dataset_wp1_common, generate_dataset_wp1_2023]
+    outputs:
+      highly_sensitive:
+        data: output/wp1/wp1_ts_2023.csv.gz
+      moderately_sensitive:
+        csv: output/wp1/checks/ts/chec*.csv
+        figs: output/wp1/checks/ts/figures/plot*.png
+        txt: output/wp1/checks/ts/skim_2023.txt
+    
+  wp1_processing_ts_2024:
+    run: r:v2 analysis/wp1/1_wp1_processing_ts_2024.R
+    needs: [generate_dataset_wp1_common, generate_dataset_wp1_2024]
+    outputs:
+      highly_sensitive:
+        data: output/wp1/wp1_ts_2024.csv.gz
+      moderately_sensitive:
+        csv: output/wp1/checks/ts/check*.csv
+        figs: output/wp1/checks/ts/figures/plots*.png
+        txt: output/wp1/checks/ts/skim_2024.txt
+     
+  wp1_processing_ts_2025:
+    run: r:v2 analysis/wp1/1_wp1_processing_ts_2025.R
+    needs: [generate_dataset_wp1_common, generate_dataset_wp1_2025]
+    outputs:
+      highly_sensitive:
+        data: output/wp1/wp1_ts_2025.csv.gz
+      moderately_sensitive:
+        csv: output/wp1/checks/ts/check_*.csv
+        figs: output/wp1/checks/ts/figures/plots_*.png
+        txt: output/wp1/checks/ts/skim_2025.txt
+     
   wp1_timeseries:
     run: r:v2 analysis/wp1/2_wp1_timeseries.R 
-    needs: [wp1_processing_ts]
+    needs: [wp1_processing_ts_2019, wp1_processing_ts_2020, wp1_processing_ts_2021, wp1_processing_ts_2022, wp1_processing_ts_2023, wp1_processing_ts_2024, wp1_processing_ts_2025]
     outputs:
       moderately_sensitive:
         csv: output/wp1/wp1_timeseries.csv

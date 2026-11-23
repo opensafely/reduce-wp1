@@ -215,7 +215,7 @@ run_wp1_checks <- function(input_file, cohort, year) {
   }
 
   for (v in names(plots)) {
-    filename <- paste0("plot_", v, "_", year, ".png")
+    filename <- paste0("plots_", v, "_", year, ".png")
   
     ggsave(filename = file.path(check_dir, "figures", filename),
            plot = plots[[v]],

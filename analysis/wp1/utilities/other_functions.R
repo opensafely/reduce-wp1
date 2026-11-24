@@ -79,29 +79,56 @@ summarise_hf <- function(data, ...) {
     )
 }
 
-create.table <- function(df){
+create.table <- function(df) {
 
-  pdays <- df %>%
-    pivot_longer(all_of(cat_vars), names_to = "variable", values_to = "value") %>%
-    group_by(variable, value) %>%
-    summarise(pdays = (rounding(as.numeric(sum(person_days)))), .groups = "drop")
-
-  table_cat <- df %>%
-    pivot_longer(all_of(cat_vars), names_to = "variable", values_to = "value") %>%
-    group_by(hf_diag_short, variable, value) %>%
-    summarise(n = rounding(n()), .groups = "drop") %>%
+  # Total population by diagnosis group
+  totals <- df %>%
     group_by(hf_diag_short) %>%
-    mutate(tot = rounding(sum(n))) %>%
-    ungroup() %>%
-    pivot_wider(
-      names_from  = hf_diag_short,
-      values_from = c(n, tot),
-      names_glue  = "{hf_diag_short}_{.value}"
+    summarise(
+      tot = rounding(n()),
+      .groups = "drop"
+    )
+
+  # Person days by characteristic
+  pdays <- df %>%
+    pivot_longer(
+      all_of(cat_vars),
+      names_to = "variable",
+      values_to = "value"
     ) %>%
-    left_join(pdays, by = c("variable", "value"))
+    group_by(variable, value) %>%
+    summarise(
+      pdays = rounding(sum(person_days, na.rm = TRUE)),
+      .groups = "drop"
+    )
+
+  # Categorical breakdowns
+  table_cat <- df %>%
+    pivot_longer(
+      all_of(cat_vars),
+      names_to = "variable",
+      values_to = "value"
+    ) %>%
+    group_by(hf_diag_short, variable, value) %>%
+    summarise(
+      n = rounding(n()),
+      .groups = "drop"
+    ) %>%
+    left_join(
+      totals,
+      by = "hf_diag_short"
+    ) %>%
+    pivot_wider(
+      names_from = hf_diag_short,
+      values_from = c(n, tot),
+      names_glue = "{hf_diag_short}_{.value}"
+    ) %>%
+    left_join(
+      pdays,
+      by = c("variable", "value")
+    )
 
   return(table_cat)
-
 }
 
 

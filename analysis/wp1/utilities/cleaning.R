@@ -4,11 +4,15 @@ clean.fn <- function(df, start_date, num_years){
   df %>%
     mutate(
       followup_end_date = 
-        pmin(death_date, 
+        pmin(
+            death_date, 
             reg_end_date, 
             start_date + years(num_years),
+            hf_diagnosis_emerg_date,
+            hf_diagnosis_primary_date,
             as.Date("2025-12-31"), 
-            na.rm = TRUE),
+            na.rm = TRUE
+            ),
       start_date = as.Date(start_date),
       across(ends_with("_date"), as.Date),
       across(all_of(c("t2dm","copd","af","ihd","ckd","hypertension","carehome_at_index",
@@ -16,7 +20,9 @@ clean.fn <- function(df, start_date, num_years){
                       "substance_abuse_1yr","homeless_1yr","housebound_1yr",
                       "obesity")), ~ replace_na(.x, FALSE))
     ) %>%
-    filter(followup_end_date >= start_date) %>%
+    filter(followup_end_date >= start_date &
+            (is.na(hf_exclude_date) | hf_exclude_date >= start_date) &
+            (is.na(death_date) | death_date >= start_date )) %>%
     mutate( 
            age_group = case_when(
              45<=age & age<55 ~ "45-54 years",
@@ -72,53 +78,30 @@ clean.fn <- function(df, start_date, num_years){
                FALSE
            ),
 
-           hf_diagnosis_primary = coalesce(
-             (hf_diagnosis_primary_date >= start_date) & 
-             (hf_diagnosis_primary_date <= pmin(followup_end_date, start_date + years(num_years), na.rm=TRUE)),
-             FALSE
-           ),
+           hf_diagnosis_primary = coalesce(hf_diagnosis_primary_date == followup_end_date, FALSE),
 
-           hf_diagnosis_apc = coalesce(
-            (hf_diagnosis_apc_date >= start_date) & 
-             (hf_diagnosis_apc_date <= pmin(followup_end_date, start_date + years(num_years), na.rm=TRUE)),
-             FALSE
-           ),
+           hf_diagnosis_apc = coalesce(hf_diagnosis_apc_date == followup_end_date, FALSE),
 
-           hf_diagnosis_ec = coalesce(
-             (hf_diagnosis_ec_date >= start_date) & 
-             (hf_diagnosis_ec_date <= pmin(followup_end_date, start_date + years(num_years), na.rm=TRUE)),
-             FALSE
-           ),
+           hf_diagnosis_ec = coalesce(hf_diagnosis_ec_date == followup_end_date, FALSE),
 
-           hf_death = coalesce(
-            (hf_death_date >= start_date) & 
-             (hf_death_date <= pmin(followup_end_date, start_date + years(num_years), na.rm=TRUE)),
-             FALSE
-           ),
+           hf_death = coalesce(hf_death_date == followup_end_date, FALSE),
 
-           hf_diagnosis_emerg = coalesce(
-            (hf_diagnosis_emerg_date >= start_date) & 
-             (hf_diagnosis_emerg_date <= pmin(followup_end_date, start_date + years(num_years), na.rm=TRUE)),
-             FALSE
-           ),
+           hf_diagnosis_emerg = coalesce(hf_diagnosis_emerg_date == followup_end_date, FALSE),
 
-           hf_diagnosis_any = coalesce(
-            (hf_diagnosis_emerg | hf_diagnosis_primary),
-            FALSE
-           ),
+           hf_diagnosis_any = coalesce((hf_diagnosis_emerg | hf_diagnosis_primary), FALSE),
 
            hf_diagnosis_type = case_when(
                 (
-                  (!is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date) &
-                  (hf_diagnosis_emerg_date < hf_diagnosis_primary_date)) |
-                  (!is.na(hf_diagnosis_emerg_date) & is.na(hf_diagnosis_primary_date)) |
-                  (hf_diagnosis_emerg_date == hf_diagnosis_primary_date)
-                 ) ~ "Emergency diagnosis",
-                ((!is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date) &
-                    (hf_diagnosis_primary_date < hf_diagnosis_emerg_date)) |
-                   is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date)) ~ "Primary care diagnosis",
-                is.na(hf_diagnosis_emerg_date) & is.na(hf_diagnosis_primary_date) ~ "No diagnosis"
+                  (hf_diagnosis_emerg == TRUE & hf_diagnosis_primary == FALSE) |
+                    (hf_diagnosis_emerg == TRUE & hf_diagnosis_primary == TRUE)
+                  ) ~ "Emergency diagnosis",
+                (
+                  (hf_diagnosis_emerg == FALSE & hf_diagnosis_primary == TRUE) 
+                ) ~ "Primary care diagnosis",
+                (hf_diagnosis_emerg == FALSE & hf_diagnosis_primary == FALSE) ~ "No diagnosis"
            ),
+
+          hf_diagnosis_both = (hf_diagnosis_emerg == TRUE & hf_diagnosis_primary == TRUE),
 
           patient_end_date = pmin(death_date, 
                                    reg_end_date, 

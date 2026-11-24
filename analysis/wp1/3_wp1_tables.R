@@ -31,27 +31,31 @@ wp1_main <- read_csv(here::here("output","wp1","wp1_main.csv"), show_col_types =
     
     across(c(migrant, non_english_speaking, smi, substance_abuse_1yr, homeless_1yr,
                   learndis, housebound_1yr, copd, died_during_study,
-                  hypertension, obese,
-                  af, ihd, ckd, t2dm, hf_diagnosis_primary,
+                  hypertension, obese, smoking, region, imd_quintile,
+                  af, ihd, ckd, t2dm, hf_diagnosis_primary, hf_diagnosis_both,
                   hf_diagnosis_apc, hf_diagnosis_ec, hf_death, 
-                  hf_diagnosis_emerg, hf_diagnosis_any, mltc), ~ replace_na(.x, FALSE)),
+                  hf_diagnosis_emerg, hf_diagnosis_any, mltc),  
+      ~ if (is.logical(.x)) {
+          replace_na(.x, FALSE)
+        } else if (is.character(.x)) {
+          replace_na(.x, "FALSE")
+        } else {
+          .x
+        }
+      ),
                 
     across(c(imd_quintile, rural, smoking, died_during_study,
                   migrant, non_english_speaking, smi, substance_abuse_1yr, homeless_1yr,
                   learndis, housebound_1yr, sex, hf_diagnosis_primary, hf_diagnosis_emerg,
-                  hf_diagnosis_any, ethnicity_cat, copd, hf_diagnosis_type, bmi_cat,
+                  hf_diagnosis_any, ethnicity_cat, copd, hf_diagnosis_type, hf_diagnosis_both, bmi_cat,
+                  hf_diagnosis_apc, hf_death, smoking, region, imd_quintile,
                   hypertension, region, obese, imd_quintile,hf_emerg_primary_same_date,
                   af, ihd, ckd, t2dm, age_group, bmi_missing, mltc), as.factor),
     
     hf_diag_short = case_when(
-      ((!is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date) &
-          (hf_diagnosis_emerg_date < hf_diagnosis_primary_date)) |
-         !is.na(hf_diagnosis_emerg_date) & is.na(hf_diagnosis_primary_date) |
-         (hf_diagnosis_emerg_date == hf_diagnosis_primary_date)) ~ "emerg",
-      ((!is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date) &
-          (hf_diagnosis_primary_date < hf_diagnosis_emerg_date)) |
-         is.na(hf_diagnosis_emerg_date) & !is.na(hf_diagnosis_primary_date)) ~ "primary",
-      is.na(hf_diagnosis_emerg_date) & is.na(hf_diagnosis_primary_date) ~ "none"
+      hf_diagnosis_emerg == TRUE ~ "emerg",
+      hf_diagnosis_primary == TRUE ~ "primary",
+      hf_diagnosis_emerg == FALSE & hf_diagnosis_primary == FALSE ~ "none"
     )
     )  
 
@@ -61,7 +65,8 @@ cat_vars <- c("sex", "imd_quintile", "rural", "smoking",
               "substance_abuse_1yr", "homeless_1yr", "ethnicity_cat",
               "copd", "af", "ihd", "ckd", "t2dm", "mltc",
               "age_group", "learndis", "died_during_study",
-              "bmi_missing")
+              "bmi_missing","hf_diagnosis_emerg","hf_diagnosis_apc", 
+              "hf_death","hf_diagnosis_primary","hf_diagnosis_both")
 
 cont_vars <- c("age","bmi")
 

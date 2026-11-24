@@ -92,7 +92,7 @@ combos <- for_combos %>%
             pdays =  rounding(sum(person_days, na.rm = TRUE)), 
             numerator = rounding(sum(hf_diag_short == "emerg", na.rm = TRUE)),
             .groups = "drop") %>% 
-  filter(pop > 100) %>%
+  filter(numerator > 100) %>%
   rowwise() %>%
   mutate(
     factor_names = paste(

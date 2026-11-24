@@ -22,7 +22,7 @@ run_wp1_checks <- function(input_file, cohort, year) {
       )
     ) 
 
-  factor_vars <- c("region", "imd_decile", "rural", "smoking", "died_during_study",
+  factor_vars <- c("region", "imd_decile", "rural", "smoking", "died_during_study", "hf_diagnosis_both",
                    "migrant", "non_english_speaking", "smi", "substance_abuse_1yr", "homeless_1yr",
                    "learndis", "housebound_1yr", "sex", "hf_diagnosis_primary",
                    "hf_diagnosis_emerg", "hf_diagnosis_any", "ethnicity_cat", "copd",
@@ -32,7 +32,7 @@ run_wp1_checks <- function(input_file, cohort, year) {
   # Frequency distribution for categorical variables
   vars <- unique(c("hf_diagnosis_emerg","hf_diagnosis_any","sex", "region", "imd_quintile", 
                     "rural", "smoking", "migrant", "non_english_speaking", "smi", "substance_abuse_1yr",
-                    "homeless_1yr",
+                    "homeless_1yr","hf_diagnosis_both",
                    "ethnicity_cat", "copd", "hypertension", "af", "ihd", "ckd", "t2dm", 
                    "age_group", "learndis", "housebound_1yr", 
                    "died_during_study", "died_before_index", "bmi_missing", "bmi_cat", "obese"))

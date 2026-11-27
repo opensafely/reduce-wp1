@@ -13,7 +13,7 @@ dir_create(here::here("output", "wp1"), recurse = TRUE)
 dir_create(here::here("output", "wp1", "figures"), recurse = TRUE)
 source(here::here("analysis", "wp1", "utilities", "other_functions.R"))
 
-years <- 2021:2025
+years <- 2019:2025
 
 
 wp1_ts_list <- list()
